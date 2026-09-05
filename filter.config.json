@@ -1,0 +1,11 @@
+{
+  "title": "Nabeel's personal filter",
+  "description": "Personal AdGuard rules compiled for each supported platform.",
+  "homepage": "https://github.com/nabekhan/adguard-user-filter",
+  "expires": "1 hour",
+  "lists": {
+    "youtube-shorts": {
+      "enabled": true
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "adguard-user-filter",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Personal, modular AdGuard filter subscriptions.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "validate": "npm run build && npx aglint lists/*.txt"
+  },
+  "dependencies": {
+    "@adguard/filters-compiler": "3.3.0"
+  },
+  "devDependencies": {
+    "@adguard/aglint": "3.0.3"
+  }
+}
