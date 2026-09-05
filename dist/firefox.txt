@@ -1,8 +1,8 @@
-! Checksum: wtyA4QAz19VqLY35uXzikg
+! Checksum: sU9PflhH36ZWPH+H6JpTnQ
 ! Title: Nabeel's personal filter
 ! Description: Personal AdGuard rules compiled for each supported platform.
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-05T19:10:57+00:00
+! TimeUpdated: 2026-09-05T19:12:16+00:00
 ! Expires: 10 days (update frequency)
 ! YouTube Shorts rules go here.
 ! This starter list intentionally has no active rules.
