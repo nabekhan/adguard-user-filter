@@ -1,25 +1,17 @@
 // ==UserScript==
 // @name         Userscript Installer
 // @namespace    https://github.com/nabekhan/filters-userscripts
-// @version      0.9.1
+// @version      0.9.2
 // @description  Opens userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/filters-userscripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js
 // @updateURL    https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js
 // @match        https://*/*
-// @grant        GM.deleteValue
-// @grant        GM.download
-// @grant        GM.getValue
 // @grant        GM.openInTab
 // @grant        GM.registerMenuCommand
-// @grant        GM.setValue
 // @grant        GM.xmlHttpRequest
-// @grant        GM_deleteValue
-// @grant        GM_download
-// @grant        GM_getValue
 // @grant        GM_openInTab
 // @grant        GM_registerMenuCommand
-// @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
 // @connect      *
 // @run-at       document-idle
@@ -39,9 +31,6 @@
     safari: 'Safari',
     windows: 'Windows',
   };
-  const archiveKey = 'userscript-installer-archive';
-  const downloadHelper =
-    'https://github.com/nabekhan/filters-userscripts#userscript-installer-download';
   const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
   const parseConfig = (text) => {
@@ -214,92 +203,6 @@
     return createZip(files);
   };
 
-  const encodeArchive = async (archive) => {
-    const bytes = new Uint8Array(await archive.arrayBuffer());
-    let binary = '';
-    for (let offset = 0; offset < bytes.length; offset += 0x8000) {
-      binary += String.fromCharCode(...bytes.subarray(offset, offset + 0x8000));
-    }
-    return btoa(binary);
-  };
-
-  const decodeArchive = (encoded) => {
-    const binary = atob(encoded);
-    return new Blob(
-      [Uint8Array.from(binary, (character) => character.charCodeAt(0))],
-      { type: 'application/zip' },
-    );
-  };
-
-  const storeArchive = async (archive) => {
-    const encoded = await encodeArchive(archive);
-    const modernApi = typeof GM === 'object' ? GM : undefined;
-    if (typeof modernApi?.setValue === 'function') {
-      await modernApi.setValue(archiveKey, encoded);
-    } else if (typeof GM_setValue === 'function') {
-      await GM_setValue(archiveKey, encoded);
-    } else {
-      throw new Error('This userscript manager cannot save the ZIP');
-    }
-    openInTab(downloadHelper);
-  };
-
-  const takeArchive = async () => {
-    const modernApi = typeof GM === 'object' ? GM : undefined;
-    let encoded;
-    if (typeof modernApi?.getValue === 'function') {
-      encoded = await modernApi.getValue(archiveKey);
-      await modernApi.deleteValue(archiveKey);
-    } else if (typeof GM_getValue === 'function') {
-      encoded = await GM_getValue(archiveKey);
-      await GM_deleteValue(archiveKey);
-    }
-    return typeof encoded === 'string' ? decodeArchive(encoded) : undefined;
-  };
-
-  const downloadNatively = async (archive) => {
-    const modernApi = typeof GM === 'object' ? GM : undefined;
-    if (typeof modernApi?.download === 'function') {
-      await modernApi.download({
-        name: 'userscripts.zip',
-        saveAs: true,
-        url: archive,
-      });
-      return true;
-    }
-    if (typeof GM_download !== 'function') {
-      return false;
-    }
-
-    const url = URL.createObjectURL(archive);
-    try {
-      await new Promise((resolve, reject) => {
-        const pending = GM_download({
-          name: 'userscripts.zip',
-          onerror: reject,
-          onload: resolve,
-          saveAs: true,
-          url,
-        });
-        pending?.catch?.(reject);
-      });
-      return true;
-    } finally {
-      URL.revokeObjectURL(url);
-    }
-  };
-
-  const saveArchive = async (archive) => {
-    try {
-      if (await downloadNatively(archive)) {
-        return;
-      }
-    } catch {
-      // Use the browser-page fallback below.
-    }
-    await storeArchive(archive);
-  };
-
   const resolveSource = (key, entry) => {
     if (!slugPattern.test(key)) {
       throw new Error(`${key} is not a valid key`);
@@ -424,12 +327,16 @@
     return actionButton;
   };
 
-  const createDownloadLink = (archive) => {
+  const createDownloadControl = (archive) => {
     downloadUrl = URL.createObjectURL(archive);
+    const control = document.createElement('div');
+    control.style.position = 'relative';
     const saveLink = document.createElement('a');
     saveLink.href = downloadUrl;
     saveLink.download = 'userscripts.zip';
     saveLink.textContent = 'Save ZIP';
+    saveLink.title =
+      'If clicking does not download, right-click and choose Save Link As.';
     saveLink.style.cssText = [
       'padding: 5px 10px',
       'border: 1px solid #0969da',
@@ -440,47 +347,30 @@
       'text-decoration: none',
       'cursor: pointer',
     ].join(';');
+
+    const hint = document.createElement('div');
+    hint.hidden = true;
+    hint.textContent =
+      'If it does not download, right-click Save ZIP and choose Save Link As.';
+    hint.style.cssText = [
+      'position: absolute',
+      'top: calc(100% + 6px)',
+      'right: 0',
+      'z-index: 1',
+      'width: 190px',
+      'padding: 6px 8px',
+      'border: 1px solid #8c959f',
+      'border-radius: 6px',
+      'background: Canvas',
+      'color: CanvasText',
+      'font: 12px/1.3 system-ui, sans-serif',
+      'box-shadow: 0 2px 8px rgb(0 0 0 / 25%)',
+    ].join(';');
     saveLink.addEventListener('click', () => {
-      const savedUrl = downloadUrl;
-      downloadUrl = undefined;
-      setTimeout(() => URL.revokeObjectURL(savedUrl), 60_000);
+      hint.hidden = false;
     });
-    return saveLink;
-  };
-
-  const createSaveButton = (archive) => {
-    const saveButton = createAction('Save ZIP', true, async () => {
-      saveButton.disabled = true;
-      try {
-        await saveArchive(archive);
-      } catch (error) {
-        showMessage(`Could not save userscripts: ${error.message}`);
-      } finally {
-        saveButton.disabled = false;
-      }
-    });
-    return saveButton;
-  };
-
-  const showDownloadHelper = async () => {
-    try {
-      const archive = await takeArchive();
-      if (archive === undefined) {
-        showMessage('No userscripts ZIP is ready.');
-        return;
-      }
-      const downloadPanel = createPanel();
-      downloadPanel.setAttribute('aria-label', 'Download userscripts');
-      const text = document.createElement('div');
-      text.textContent = 'userscripts.zip is ready.';
-      const actions = document.createElement('div');
-      actions.style.cssText =
-        'display: flex; justify-content: flex-end; margin-top: 10px';
-      actions.append(createDownloadLink(archive));
-      downloadPanel.append(text, actions);
-    } catch (error) {
-      showMessage(`Could not load userscripts: ${error.message}`);
-    }
+    control.append(saveLink, hint);
+    return control;
   };
 
   const showMessage = (message) => {
@@ -525,7 +415,7 @@
         try {
           const archive = await downloadScripts(scripts);
           if (panel === installPanel) {
-            downloadArea.replaceChildren(createSaveButton(archive));
+            downloadArea.replaceChildren(createDownloadControl(archive));
           }
         } catch (error) {
           if (panel === installPanel) {
@@ -665,15 +555,6 @@
   };
 
   const installFromCurrentPage = () => toggleInstaller(configFromCurrentPage);
-
-  if (
-    location.hostname === 'github.com' &&
-    location.pathname.replace(/\/$/, '') === '/nabekhan/filters-userscripts' &&
-    location.hash === '#userscript-installer-download'
-  ) {
-    showDownloadHelper();
-    return;
-  }
 
   const modernApi = typeof GM === 'object' ? GM : undefined;
   const registerMenuCommand =

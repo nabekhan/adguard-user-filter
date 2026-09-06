@@ -1,7 +1,7 @@
 # Filters and userscripts
 
 [Userscripts config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts.json)
-· [Filter config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filter.json)
+[Filter config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filter.json)
 
 ## Filters
 
@@ -40,7 +40,8 @@ Patch replacements use `{ from, to }`. `from` can be text or a regular expressio
 Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js).
 Open a raw userscript config page and click the bottom-right button. Use the
 arrows to move between scripts. `Download all` prepares `userscripts.zip`; click
-`Save ZIP` to save it.
+`Save ZIP` to save it. If blocked, right-click `Save ZIP` and choose
+`Save Link As`.
 
 ## Development
 
