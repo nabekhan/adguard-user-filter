@@ -20,13 +20,14 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
+      - run: npm run format
       - run: npm run validate
       - if: github.event_name == 'push'
         run: |
-          git add dist
+          git add --all
           git diff --cached --quiet || {
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git commit -m 'chore: update compiled filters'
+            git commit -m 'chore: format and rebuild filters [skip ci]'
             git push
           }

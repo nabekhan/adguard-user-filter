@@ -3,7 +3,9 @@ import { resolve } from 'node:path';
 import { compile } from '@adguard/filters-compiler';
 
 const root = resolve(import.meta.dirname, '..');
-const config = JSON.parse(await readFile(resolve(root, 'filter.config.json'), 'utf8'));
+const config = JSON.parse(
+    await readFile(resolve(root, 'filter.config.json'), 'utf8'),
+);
 const filterId = 100001;
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)
@@ -43,15 +45,16 @@ const sourceDir = resolve(buildDir, 'filters');
 const platformsDir = resolve(buildDir, 'platforms');
 const distDir = resolve(root, 'dist');
 const template = [
-    ...enabled.map(({ name, url }) => (
+    ...enabled.map(({ name, url }) =>
         url === undefined
             ? `@include ../../../lists/${name}.txt /stripComments /ignoreTrustLevel`
-            : `@include ${JSON.stringify(new URL(url).href)} /stripComments`
-    )),
+            : `@include ${JSON.stringify(new URL(url).href)} /stripComments`,
+    ),
     '',
 ].join('\n');
 
-const writeJson = (path, value) => writeFile(path, `${JSON.stringify(value, null, 2)}\n`);
+const writeJson = (path, value) =>
+    writeFile(path, `${JSON.stringify(value, null, 2)}\n`);
 
 await rm(buildDir, { recursive: true, force: true });
 await rm(distDir, { recursive: true, force: true });
@@ -87,7 +90,10 @@ await writeJson(resolve(buildDir, 'locales', 'en', 'filters.json'), [
     },
 ]);
 await writeJson(resolve(buildDir, 'locales', 'en', 'groups.json'), [
-    { 'group.1.name': 'User filters', 'group.1.description': 'User-defined filters' },
+    {
+        'group.1.name': 'User filters',
+        'group.1.description': 'User-defined filters',
+    },
 ]);
 await writeJson(resolve(buildDir, 'locales', 'en', 'tags.json'), [
     { 'tag.1.name': 'Other', 'tag.1.description': 'User-defined rules' },
@@ -115,5 +121,8 @@ const subscriptions = {
 
 await mkdir(distDir, { recursive: true });
 for (const [name, source] of Object.entries(subscriptions)) {
-    await copyFile(resolve(platformsDir, source), resolve(distDir, `${name}.txt`));
+    await copyFile(
+        resolve(platformsDir, source),
+        resolve(distDir, `${name}.txt`),
+    );
 }

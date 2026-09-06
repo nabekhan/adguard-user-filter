@@ -7,13 +7,17 @@
     "node": ">=22"
   },
   "scripts": {
+    "prebuild": "npm run format:check",
     "build": "node scripts/build.mjs",
+    "format": "node scripts/format-config.mjs && prettier --write . --ignore-unknown",
+    "format:check": "node scripts/format-config.mjs --check && prettier --check . --ignore-unknown",
     "validate": "npm run build && npx aglint"
   },
   "dependencies": {
     "@adguard/filters-compiler": "3.3.0"
   },
   "devDependencies": {
-    "@adguard/aglint": "3.0.3"
+    "@adguard/aglint": "3.0.3",
+    "prettier": "3.9.6"
   }
 }

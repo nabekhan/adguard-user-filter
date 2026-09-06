@@ -27,6 +27,7 @@ Node 22 is required.
 
 ```sh
 npm ci
+npm run format
 npm run validate
 ```
 
@@ -34,16 +35,16 @@ Generated subscriptions are written to `dist/`.
 
 Use the matching raw URL in AdGuard's **Custom filters** setting:
 
-| Device / app | Subscription path |
-| --- | --- |
-| AdGuard for iOS | `dist/ios.txt` |
-| AdGuard for Android | `dist/android.txt` |
-| AdGuard for Mac | `dist/mac.txt` |
-| AdGuard for Windows | `dist/windows.txt` |
-| AdGuard CLI for Linux | `dist/linux.txt` |
-| AdGuard Mini / Safari | `dist/safari.txt` |
+| Device / app               | Subscription path   |
+| -------------------------- | ------------------- |
+| AdGuard for iOS            | `dist/ios.txt`      |
+| AdGuard for Android        | `dist/android.txt`  |
+| AdGuard for Mac            | `dist/mac.txt`      |
+| AdGuard for Windows        | `dist/windows.txt`  |
+| AdGuard CLI for Linux      | `dist/linux.txt`    |
+| AdGuard Mini / Safari      | `dist/safari.txt`   |
 | Chromium browser extension | `dist/chromium.txt` |
-| Firefox browser extension | `dist/firefox.txt` |
+| Firefox browser extension  | `dist/firefox.txt`  |
 
 Raw URL prefix:
 

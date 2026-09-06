@@ -1,0 +1,11 @@
+{
+  "singleQuote": true,
+  "overrides": [
+    {
+      "files": "*.mjs",
+      "options": {
+        "tabWidth": 4
+      }
+    }
+  ]
+}
