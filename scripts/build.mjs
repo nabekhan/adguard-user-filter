@@ -55,10 +55,10 @@ const writeJson = (path, value) => writeFile(path, `${JSON.stringify(value, null
 
 await rm(buildDir, { recursive: true, force: true });
 await rm(distDir, { recursive: true, force: true });
-await mkdir(resolve(sourceDir, 'personal'), { recursive: true });
-await writeFile(resolve(sourceDir, 'personal', 'template.txt'), template);
-await writeFile(resolve(sourceDir, 'personal', 'exclude.txt'), '');
-await writeJson(resolve(sourceDir, 'personal', 'metadata.json'), {
+await mkdir(resolve(sourceDir, 'user-filter'), { recursive: true });
+await writeFile(resolve(sourceDir, 'user-filter', 'template.txt'), template);
+await writeFile(resolve(sourceDir, 'user-filter', 'exclude.txt'), '');
+await writeJson(resolve(sourceDir, 'user-filter', 'metadata.json'), {
     filterId,
     name: config.title,
     description: config.description,
@@ -75,7 +75,7 @@ await mkdir(resolve(buildDir, 'groups'), { recursive: true });
 await mkdir(resolve(buildDir, 'tags'), { recursive: true });
 await mkdir(resolve(buildDir, 'locales', 'en'), { recursive: true });
 await writeJson(resolve(buildDir, 'groups', 'metadata.json'), [
-    { groupId: 1, groupName: 'Personal', displayNumber: 1 },
+    { groupId: 1, groupName: 'User filters', displayNumber: 1 },
 ]);
 await writeJson(resolve(buildDir, 'tags', 'metadata.json'), [
     { tagId: 1, keyword: 'purpose:other' },
@@ -87,10 +87,10 @@ await writeJson(resolve(buildDir, 'locales', 'en', 'filters.json'), [
     },
 ]);
 await writeJson(resolve(buildDir, 'locales', 'en', 'groups.json'), [
-    { 'group.1.name': 'Personal', 'group.1.description': 'Personal filters' },
+    { 'group.1.name': 'User filters', 'group.1.description': 'User-defined filters' },
 ]);
 await writeJson(resolve(buildDir, 'locales', 'en', 'tags.json'), [
-    { 'tag.1.name': 'Other', 'tag.1.description': 'Personal rules' },
+    { 'tag.1.name': 'Other', 'tag.1.description': 'User-defined rules' },
 ]);
 
 await compile(
