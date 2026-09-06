@@ -12,12 +12,12 @@
     "norsagir-youtube-shorts-extras": {
       "category": "nuisances",
       "enabled": true,
-      "file": "youtube/youtube-shorts-extras.txt"
+      "url": "https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/lists/youtube/youtube-shorts-extras.txt"
     },
     "siri-ai-enable": {
       "category": "other",
       "enabled": true,
-      "file": "siri-ai-enable.txt"
+      "url": "https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/lists/siri-ai-enable.txt"
     }
   }
 }

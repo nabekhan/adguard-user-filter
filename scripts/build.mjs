@@ -6,6 +6,11 @@ const root = resolve(import.meta.dirname, '..');
 const config = JSON.parse(
     await readFile(resolve(root, 'filter.config.json'), 'utf8'),
 );
+const userscriptsConfig = JSON.parse(
+    await readFile(resolve(root, 'userscripts.config.json'), 'utf8'),
+);
+const rawRoot =
+    'https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/';
 const filterId = 100001;
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)
@@ -90,6 +95,47 @@ const template = [
 const writeJson = (path, value) =>
     writeFile(path, `${JSON.stringify(value, null, 2)}\n`);
 
+const resolveConfig = (source, collectionName, localDirectory) => ({
+    ...source,
+    [collectionName]: Object.fromEntries(
+        Object.entries(source[collectionName] ?? {}).map(([name, entry]) => {
+            const { file, url, ...settings } = entry;
+            if ((file === undefined) === (url === undefined)) {
+                throw new Error(
+                    `${collectionName}.${name} must specify exactly one of file or url`,
+                );
+            }
+
+            let resolvedUrl;
+            if (file !== undefined) {
+                if (typeof file !== 'string' || file.trim() === '') {
+                    throw new Error(`Invalid local file for ${name}`);
+                }
+
+                const directoryUrl = new URL(`${localDirectory}/`, rawRoot);
+                resolvedUrl = new URL(file, directoryUrl);
+                if (!resolvedUrl.href.startsWith(directoryUrl.href)) {
+                    throw new Error(
+                        `Local file for ${name} must be inside ${localDirectory}/`,
+                    );
+                }
+            } else {
+                if (typeof url !== 'string' || url.trim() === '') {
+                    throw new Error(`Invalid remote URL for ${name}`);
+                }
+
+                resolvedUrl = new URL(url);
+            }
+
+            if (resolvedUrl.protocol !== 'https:') {
+                throw new Error(`URL for ${name} must use HTTPS`);
+            }
+
+            return [name, { ...settings, url: resolvedUrl.href }];
+        }),
+    ),
+});
+
 await rm(buildDir, { recursive: true, force: true });
 await rm(distDir, { recursive: true, force: true });
 await mkdir(resolve(sourceDir, 'user-filter'), { recursive: true });
@@ -154,6 +200,14 @@ const subscriptions = {
 };
 
 await mkdir(distDir, { recursive: true });
+await writeJson(
+    resolve(distDir, 'filter.config.json'),
+    resolveConfig(config, 'lists', 'lists'),
+);
+await writeJson(
+    resolve(distDir, 'userscripts.config.json'),
+    resolveConfig(userscriptsConfig, 'scripts', 'userscripts'),
+);
 for (const [name, source] of Object.entries(subscriptions)) {
     await copyFile(
         resolve(platformsDir, source),

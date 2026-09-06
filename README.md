@@ -1,4 +1,4 @@
-# AdGuard user filter
+# Filters and userscripts
 
 Platform-specific subscriptions assembled from `filter.config.json`.
 
@@ -12,7 +12,7 @@ specify exactly one of `file` or `url`.
 {
   "lists": {
     "siri-ai-enable": {
-      "category": "allowlists",
+      "category": "other",
       "enabled": true,
       "file": "siri-ai-enable.txt"
     },
@@ -21,7 +21,7 @@ specify exactly one of `file` or `url`.
       "enabled": true,
       "url": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
     },
-    "youtube-shorts-extras": {
+    "norsagir-youtube-shorts-extras": {
       "category": "nuisances",
       "enabled": true,
       "file": "youtube/youtube-shorts-extras.txt"
@@ -31,7 +31,8 @@ specify exactly one of `file` or `url`.
 ```
 
 Source comments are removed from generated subscriptions. Subscription metadata
-and checksums are retained.
+and checksums are retained. `dist/filter.config.json` contains the same entries
+with local files converted to raw URLs.
 
 ## Build
 
@@ -61,7 +62,21 @@ Use the matching raw URL in AdGuard's **Custom filters** setting:
 Raw URL prefix:
 
 ```text
-https://raw.githubusercontent.com/nabekhan/adguard-user-filter/main/
+https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/
 ```
 
 Pull requests are validated. Pushes to `main` rebuild `dist/`.
+
+## Userscripts
+
+Enabled userscripts are listed in `userscripts.config.json`. Local `file` paths
+are relative to `userscripts/`; remote scripts use an HTTPS `url`. The build
+writes a URL-only copy to `dist/userscripts.config.json` for the installer.
+
+Install
+[`userscript-installer.user.js`](https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/userscripts/userscript-installer.user.js),
+then open this repository and click **Install userscripts**. The installer opens
+each enabled script and the userscript manager asks for confirmation.
+
+This flow uses APIs supported by AdGuard, Userscripts for Safari, Tampermonkey,
+and Violentmonkey. Silent bulk installation is not supported by these managers.

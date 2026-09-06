@@ -1,0 +1,17 @@
+{
+  "title": "Nabeel's userscripts",
+  "description": "Userscripts installed from local and remote sources.",
+  "homepage": "https://github.com/nabekhan/user-filter-scripts",
+  "scripts": {
+    "grocery-price-per-unit": {
+      "category": "shopping",
+      "enabled": true,
+      "url": "https://github.com/nabekhan/grocery-price-per-unit/releases/latest/download/Grocery-Price-Per-Unit.user.js"
+    },
+    "userscript-installer": {
+      "category": "tools",
+      "enabled": true,
+      "file": "userscript-installer.user.js"
+    }
+  }
+}

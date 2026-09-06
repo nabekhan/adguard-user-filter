@@ -1,5 +1,5 @@
 {
-  "name": "adguard-user-filter",
+  "name": "user-filter-scripts",
   "private": true,
   "version": "0.1.0",
   "description": "Modular AdGuard filter subscriptions.",
