@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Userscript Installer
 // @namespace    https://github.com/nabekhan/filters-userscripts
-// @version      0.7.1
+// @version      0.8.0
 // @description  Opens userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/filters-userscripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js
@@ -269,6 +269,7 @@
   };
 
   let downloadUrl;
+  let index = 0;
   let panel;
 
   const revokeDownload = () => {
@@ -326,18 +327,7 @@
     return actionButton;
   };
 
-  const showDownload = (archive) => {
-    const downloadPanel = createPanel();
-    downloadPanel.setAttribute('aria-label', 'Download userscripts');
-
-    const text = document.createElement('div');
-    text.textContent = 'userscripts.zip is ready.';
-    downloadPanel.append(text);
-
-    const actions = document.createElement('div');
-    actions.style.cssText =
-      'display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px';
-
+  const createDownloadLink = (archive) => {
     downloadUrl = URL.createObjectURL(archive);
     const saveLink = document.createElement('a');
     saveLink.href = downloadUrl;
@@ -356,12 +346,9 @@
     saveLink.addEventListener('click', () => {
       const savedUrl = downloadUrl;
       downloadUrl = undefined;
-      closePanel();
       setTimeout(() => URL.revokeObjectURL(savedUrl), 60_000);
     });
-
-    actions.append(createAction('Close', false, closePanel), saveLink);
-    downloadPanel.append(actions);
+    return saveLink;
   };
 
   const showMessage = (message) => {
@@ -380,37 +367,58 @@
   const showInstallPanel = (scripts) => {
     const installPanel = createPanel();
     installPanel.setAttribute('aria-label', 'Install userscripts');
-    let index = 0;
-    let opened = 0;
-    let skipped = 0;
-
-    const finish = () => {
-      showMessage(
-        `Reviewed ${scripts.length}: ${opened} opened, ${skipped} skipped.`,
-      );
-    };
-
-    const advance = (installed) => {
-      if (installed) {
-        opened += 1;
-      } else {
-        skipped += 1;
-      }
-      index += 1;
-      if (index === scripts.length) {
-        finish();
-      } else {
-        render();
-      }
-    };
+    index = Math.min(index, scripts.length - 1);
 
     const render = () => {
+      revokeDownload();
       const script = scripts[index];
       installPanel.replaceChildren();
 
+      const header = document.createElement('div');
+      header.style.cssText =
+        'display: flex; align-items: center; justify-content: space-between; gap: 8px';
+      const heading = document.createElement('div');
+      const headingTitle = document.createElement('div');
+      headingTitle.textContent = 'Installer';
+      headingTitle.style.fontWeight = '700';
+      const position = document.createElement('div');
+      position.textContent = `${index + 1} of ${scripts.length}`;
+      position.style.cssText = 'color: GrayText; font-size: 12px';
+      heading.append(headingTitle, position);
+
+      const downloadArea = document.createElement('div');
+      const downloadButton = createAction('Download all', false, async () => {
+        downloadButton.disabled = true;
+        downloadButton.textContent = 'Downloading…';
+        try {
+          const archive = await downloadScripts(scripts);
+          if (panel === installPanel) {
+            downloadArea.replaceChildren(createDownloadLink(archive));
+          }
+        } catch (error) {
+          if (panel === installPanel) {
+            showMessage(`Could not download userscripts: ${error.message}`);
+          }
+        }
+      });
+      downloadArea.append(downloadButton);
+      header.append(heading, downloadArea);
+      installPanel.append(header);
+
       const progress = document.createElement('div');
-      progress.textContent = `Userscript ${index + 1} of ${scripts.length}`;
-      progress.style.cssText = 'color: GrayText; font-size: 12px';
+      progress.style.cssText =
+        'display: flex; gap: 4px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #8c959f';
+      for (let item = 0; item < scripts.length; item += 1) {
+        const marker = document.createElement('span');
+        marker.style.cssText = [
+          'height: 3px',
+          'flex: 1',
+          'border-radius: 2px',
+          `background: ${item === index ? 'CanvasText' : '#8c959f'}`,
+          `opacity: ${item === index ? '1' : '0.45'}`,
+        ].join(';');
+        progress.append(marker);
+      }
       installPanel.append(progress);
 
       const title = document.createElement('div');
@@ -450,34 +458,39 @@
 
       const actions = document.createElement('div');
       actions.style.cssText =
-        'display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 12px';
-      const downloadButton = createAction('Download all', false, async () => {
-        downloadButton.disabled = true;
-        downloadButton.textContent = 'Downloading…';
-        try {
-          showDownload(await downloadScripts(scripts));
-        } catch (error) {
-          showMessage(`Could not download userscripts: ${error.message}`);
-        }
+        'display: grid; grid-template-columns: auto 1fr auto; gap: 8px; margin-top: 12px';
+      const previous = createAction('‹', false, () => {
+        index -= 1;
+        render();
       });
-      actions.append(
-        downloadButton,
-        createAction('Close', false, closePanel),
-        createAction('Skip', !script.enabled, () => advance(false)),
-        createAction('Install', script.enabled, () => {
-          openInTab(script.url);
-          advance(true);
-        }),
-      );
+      previous.disabled = index === 0;
+      previous.title = 'Previous';
+      previous.setAttribute('aria-label', previous.title);
+      previous.style.opacity = previous.disabled ? '0.35' : '1';
+
+      const installButton = createAction('Install', true, () => {
+        openInTab(script.url);
+      });
+
+      const next = createAction('›', false, () => {
+        index += 1;
+        render();
+      });
+      next.disabled = index === scripts.length - 1;
+      next.title = 'Next';
+      next.setAttribute('aria-label', next.title);
+      next.style.opacity = next.disabled ? '0.35' : '1';
+
+      actions.append(previous, installButton, next);
       installPanel.append(actions);
     };
 
     render();
   };
 
-  const install = async (getConfig) => {
+  const install = (getConfig) => {
     try {
-      const scripts = loadScripts(await getConfig());
+      const scripts = loadScripts(getConfig());
       if (scripts.length === 0) {
         showMessage('No userscripts.');
         return;
@@ -491,7 +504,15 @@
   const configFromCurrentPage = () =>
     parseConfig(document.body?.textContent ?? '');
 
-  const installFromCurrentPage = () => install(configFromCurrentPage);
+  const toggleInstaller = (getConfig) => {
+    if (panel !== undefined) {
+      closePanel();
+      return;
+    }
+    install(getConfig);
+  };
+
+  const installFromCurrentPage = () => toggleInstaller(configFromCurrentPage);
 
   const modernApi = typeof GM === 'object' ? GM : undefined;
   const registerMenuCommand =
@@ -521,7 +542,7 @@
 
   const button = document.createElement('button');
   button.type = 'button';
-  button.textContent = '⇩';
+  button.textContent = '⇩ Install';
   button.title = 'Install userscripts from this page';
   button.setAttribute('aria-label', button.title);
   button.style.cssText = [
@@ -529,19 +550,20 @@
     'right: 8px',
     'bottom: 8px',
     'z-index: 2147483647',
-    'width: 28px',
-    'height: 28px',
-    'padding: 0',
+    'height: 32px',
+    'padding: 0 12px',
     'border: 1px solid #0969da',
-    'border-radius: 50%',
+    'border-radius: 16px',
     'background: #0969da',
     'color: white',
-    'font: 700 16px/1 system-ui, sans-serif',
-    'opacity: 0.65',
+    'font: 700 13px/1 system-ui, sans-serif',
+    'opacity: 0.8',
     'cursor: pointer',
     'box-shadow: 0 1px 3px rgb(0 0 0 / 25%)',
   ].join(';');
-  button.addEventListener('click', () => install(() => currentPageConfig));
+  button.addEventListener('click', () =>
+    toggleInstaller(() => currentPageConfig),
+  );
 
   document.body.append(button);
 })();
