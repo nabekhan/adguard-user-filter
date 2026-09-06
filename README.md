@@ -32,8 +32,6 @@ Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/
 - Local files: `sources/userscripts/<website>/<category>/<key>.user.js`
 - Generated config: `dist/userscripts/config.json`
 
-Optional `platforms` values are recommendations and do not affect installation.
-
 Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js).
 Open a raw userscript config page, click the bottom-right button, and confirm.
 
