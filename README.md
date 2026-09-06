@@ -32,7 +32,8 @@ specify exactly one of `file` or `url`.
 
 Source comments are removed from generated subscriptions. Subscription metadata
 and checksums are retained. `dist/filter.config.json` contains the same entries
-with local files converted to raw URLs.
+with local files converted to raw URLs. The workflow creates that file before
+using it to build the combined filters.
 
 ## Build
 
@@ -43,6 +44,10 @@ npm ci
 npm run format
 npm run validate
 ```
+
+`npm ci` configures the repository's pre-commit hook. The hook runs the
+formatter and stops the commit if formatting produces changes so they can be
+reviewed and staged.
 
 Generated subscriptions are written to `dist/`.
 
@@ -75,8 +80,11 @@ writes a URL-only copy to `dist/userscripts.config.json` for the installer.
 
 Install
 [`userscript-installer.user.js`](https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/userscripts/userscript-installer.user.js),
-then open this repository and click **Install userscripts**. The installer opens
-each enabled script and the userscript manager asks for confirmation.
+then navigate directly to a raw `userscripts.config.json` page. If the current
+page contains a valid config JSON object, click **Install userscripts**. Managers
+that support userscript menu commands also provide **Install userscripts from
+this page**. The installer opens each enabled script so the userscript manager
+can ask for confirmation.
 
 This flow uses APIs supported by AdGuard, Userscripts for Safari, Tampermonkey,
 and Violentmonkey. Silent bulk installation is not supported by these managers.

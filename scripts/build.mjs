@@ -1,22 +1,16 @@
 import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { isAbsolute, relative, resolve, sep } from 'node:path';
+import { resolve } from 'node:path';
 import { compile } from '@adguard/filters-compiler';
 
 const root = resolve(import.meta.dirname, '..');
 const config = JSON.parse(
-    await readFile(resolve(root, 'filter.config.json'), 'utf8'),
+    await readFile(resolve(root, 'dist', 'filter.config.json'), 'utf8'),
 );
-const userscriptsConfig = JSON.parse(
-    await readFile(resolve(root, 'userscripts.config.json'), 'utf8'),
-);
-const rawRoot =
-    'https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/';
 const filterId = 100001;
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)
     .map(([name, value]) => ({
         name,
-        file: value.file,
         url: value.url,
     }));
 
@@ -26,49 +20,24 @@ for (const field of ['title', 'description', 'homepage', 'expires']) {
     }
 }
 
-const listsDir = resolve(root, 'lists');
-
-for (const { name, file, url } of enabled) {
+for (const { name, url } of enabled) {
     if (!/^[a-z0-9][a-z0-9-]*$/i.test(name)) {
         throw new Error(`Invalid list name: ${name}`);
     }
 
-    if ((file === undefined) === (url === undefined)) {
-        throw new Error(`List ${name} must specify exactly one of file or url`);
+    if (typeof url !== 'string' || url.trim() === '') {
+        throw new Error(`Invalid list URL for ${name}`);
     }
 
-    if (file !== undefined) {
-        if (typeof file !== 'string' || file.trim() === '') {
-            throw new Error(`Invalid local file for ${name}`);
-        }
-
-        const localPath = resolve(listsDir, file);
-        const pathWithinLists = relative(listsDir, localPath);
-        if (
-            pathWithinLists === '' ||
-            pathWithinLists === '..' ||
-            pathWithinLists.startsWith(`..${sep}`) ||
-            isAbsolute(pathWithinLists)
-        ) {
-            throw new Error(`Local file for ${name} must be inside lists/`);
-        }
+    let parsedUrl;
+    try {
+        parsedUrl = new URL(url);
+    } catch {
+        throw new Error(`Invalid list URL for ${name}: ${url}`);
     }
 
-    if (url !== undefined) {
-        if (typeof url !== 'string' || url.trim() === '') {
-            throw new Error(`Invalid remote list URL for ${name}`);
-        }
-
-        let parsedUrl;
-        try {
-            parsedUrl = new URL(url);
-        } catch {
-            throw new Error(`Invalid remote list URL for ${name}: ${url}`);
-        }
-
-        if (parsedUrl.protocol !== 'https:') {
-            throw new Error(`Remote list URL for ${name} must use HTTPS`);
-        }
+    if (parsedUrl.protocol !== 'https:') {
+        throw new Error(`List URL for ${name} must use HTTPS`);
     }
 }
 
@@ -77,17 +46,9 @@ const sourceDir = resolve(buildDir, 'filters');
 const platformsDir = resolve(buildDir, 'platforms');
 const distDir = resolve(root, 'dist');
 const template = [
-    ...enabled.map(({ file, url }) =>
-        file === undefined
-            ? `@include ${JSON.stringify(new URL(url).href)} /stripComments`
-            : `@include ${JSON.stringify(
-                  relative(
-                      resolve(sourceDir, 'user-filter'),
-                      resolve(listsDir, file),
-                  )
-                      .split(sep)
-                      .join('/'),
-              )} /stripComments /ignoreTrustLevel`,
+    ...enabled.map(
+        ({ url }) =>
+            `@include ${JSON.stringify(new URL(url).href)} /stripComments`,
     ),
     '',
 ].join('\n');
@@ -95,49 +56,7 @@ const template = [
 const writeJson = (path, value) =>
     writeFile(path, `${JSON.stringify(value, null, 2)}\n`);
 
-const resolveConfig = (source, collectionName, localDirectory) => ({
-    ...source,
-    [collectionName]: Object.fromEntries(
-        Object.entries(source[collectionName] ?? {}).map(([name, entry]) => {
-            const { file, url, ...settings } = entry;
-            if ((file === undefined) === (url === undefined)) {
-                throw new Error(
-                    `${collectionName}.${name} must specify exactly one of file or url`,
-                );
-            }
-
-            let resolvedUrl;
-            if (file !== undefined) {
-                if (typeof file !== 'string' || file.trim() === '') {
-                    throw new Error(`Invalid local file for ${name}`);
-                }
-
-                const directoryUrl = new URL(`${localDirectory}/`, rawRoot);
-                resolvedUrl = new URL(file, directoryUrl);
-                if (!resolvedUrl.href.startsWith(directoryUrl.href)) {
-                    throw new Error(
-                        `Local file for ${name} must be inside ${localDirectory}/`,
-                    );
-                }
-            } else {
-                if (typeof url !== 'string' || url.trim() === '') {
-                    throw new Error(`Invalid remote URL for ${name}`);
-                }
-
-                resolvedUrl = new URL(url);
-            }
-
-            if (resolvedUrl.protocol !== 'https:') {
-                throw new Error(`URL for ${name} must use HTTPS`);
-            }
-
-            return [name, { ...settings, url: resolvedUrl.href }];
-        }),
-    ),
-});
-
 await rm(buildDir, { recursive: true, force: true });
-await rm(distDir, { recursive: true, force: true });
 await mkdir(resolve(sourceDir, 'user-filter'), { recursive: true });
 await writeFile(resolve(sourceDir, 'user-filter', 'template.txt'), template);
 await writeFile(resolve(sourceDir, 'user-filter', 'exclude.txt'), '');
@@ -200,14 +119,6 @@ const subscriptions = {
 };
 
 await mkdir(distDir, { recursive: true });
-await writeJson(
-    resolve(distDir, 'filter.config.json'),
-    resolveConfig(config, 'lists', 'lists'),
-);
-await writeJson(
-    resolve(distDir, 'userscripts.config.json'),
-    resolveConfig(userscriptsConfig, 'scripts', 'userscripts'),
-);
 for (const [name, source] of Object.entries(subscriptions)) {
     await copyFile(
         resolve(platformsDir, source),

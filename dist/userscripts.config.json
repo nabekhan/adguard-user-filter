@@ -1,17 +1,48 @@
 {
-  "title": "Nabeel's userscripts",
+  "title": "Personal userscripts",
   "description": "Userscripts installed from local and remote sources.",
   "homepage": "https://github.com/nabekhan/user-filter-scripts",
+  "requires": "userscript-installer",
   "scripts": {
+    "sb.js userscript": {
+      "category": "nuisances",
+      "enabled": true,
+      "url": "https://raw.githubusercontent.com/mchangrh/sb.js/main/docs/sb.user.js"
+    },
     "grocery-price-per-unit": {
       "category": "shopping",
       "enabled": true,
       "url": "https://github.com/nabekhan/grocery-price-per-unit/releases/latest/download/Grocery-Price-Per-Unit.user.js"
     },
+    "Autocomplete Deck": {
+      "category": "tools",
+      "enabled": true,
+      "url": "https://update.greasyfork.org/scripts/527303/Auto%20Complete%20Deck.user.js"
+    },
+    "Base64 Autodecode": {
+      "category": "tools",
+      "enabled": true,
+      "url": "https://update.greasyfork.org/scripts/485772/FMHY%20Base64%20Auto%20Decoder.user.js"
+    },
+    "Don't Track Me Google": {
+      "category": "tools",
+      "enabled": true,
+      "url": "https://update.greasyfork.org/scripts/428243/Don%27t%20track%20me%20Google.user.js"
+    },
+    "Old Reddit": {
+      "category": "tools",
+      "enabled": true,
+      "url": "https://update.greasyfork.org/scripts/423965/Good%20o%27l%20Reddit.user.js"
+    },
     "userscript-installer": {
       "category": "tools",
       "enabled": true,
       "url": "https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/userscripts/userscript-installer.user.js"
+    },
+    "Youtube Safari PIP": {
+      "category": "tools",
+      "enabled": true,
+      "url": "https://update.greasyfork.org/scripts/525416/YouTube%20Safari%20iOS%20PiP%20Block%20Unblocker.user.js"
     }
   }
 }

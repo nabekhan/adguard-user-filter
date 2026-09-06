@@ -1,0 +1,33 @@
+#!/bin/sh
+
+set -eu
+
+before_format=$(mktemp -t user-filter-scripts-before.XXXXXX)
+after_format=$(mktemp -t user-filter-scripts-after.XXXXXX)
+trap 'rm -f "$before_format" "$after_format"' EXIT HUP INT TERM
+
+git diff --binary >"$before_format"
+
+if command -v npm >/dev/null 2>&1; then
+    npm run format
+else
+    nix_command=$(command -v nix 2>/dev/null || true)
+    if [ -z "$nix_command" ] && [ -x /run/current-system/sw/bin/nix ]; then
+        nix_command=/run/current-system/sw/bin/nix
+    fi
+    if [ -z "$nix_command" ] && [ -x /nix/var/nix/profiles/default/bin/nix ]; then
+        nix_command=/nix/var/nix/profiles/default/bin/nix
+    fi
+    if [ -z "$nix_command" ]; then
+        echo "pre-commit: npm or Nix is required to run the formatter" >&2
+        exit 1
+    fi
+
+    "$nix_command" shell nixpkgs#nodejs_22 --command npm run format
+fi
+
+git diff --binary >"$after_format"
+if ! cmp -s "$before_format" "$after_format"; then
+    echo "pre-commit: the formatter changed files; review and stage them, then commit again" >&2
+    exit 1
+fi

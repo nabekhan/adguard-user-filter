@@ -1,17 +1,16 @@
 // ==UserScript==
-// @name         Nabeel's Userscript Installer
+// @name         Personal Userscript Installer
 // @namespace    https://github.com/nabekhan/user-filter-scripts
-// @version      0.1.0
-// @description  Opens installation pages for enabled scripts in the generated config.
+// @version      0.3.0
+// @description  Installs enabled userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/user-filter-scripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/userscripts/userscript-installer.user.js
 // @updateURL    https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/userscripts/userscript-installer.user.js
-// @match        https://github.com/nabekhan/user-filter-scripts*
+// @match        https://*/*
 // @grant        GM.openInTab
-// @grant        GM.xmlHttpRequest
+// @grant        GM.registerMenuCommand
 // @grant        GM_openInTab
-// @grant        GM_xmlhttpRequest
-// @connect      raw.githubusercontent.com
+// @grant        GM_registerMenuCommand
 // @run-at       document-idle
 // @noframes
 // ==/UserScript==
@@ -19,45 +18,32 @@
 (() => {
   'use strict';
 
-  const rawRoot =
-    'https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/';
-  const configUrl = `${rawRoot}dist/userscripts.config.json`;
-  const installerUrl = `${rawRoot}userscripts/userscript-installer.user.js`;
+  const parseConfig = (text) => {
+    let config;
+    try {
+      config = JSON.parse(text);
+    } catch {
+      throw new Error('The config response is not valid JSON');
+    }
 
-  const requestText = (url) =>
-    new Promise((resolve, reject) => {
-      const modernApi = typeof GM === 'object' ? GM : undefined;
-      const request =
-        typeof modernApi?.xmlHttpRequest === 'function'
-          ? modernApi.xmlHttpRequest.bind(modernApi)
-          : typeof GM_xmlhttpRequest === 'function'
-            ? GM_xmlhttpRequest
-            : undefined;
+    if (
+      config === null ||
+      Array.isArray(config) ||
+      typeof config !== 'object'
+    ) {
+      throw new Error('The config JSON must be an object');
+    }
 
-      if (request === undefined) {
-        reject(new Error('This userscript manager cannot load the config'));
-        return;
-      }
+    if (
+      config.scripts === null ||
+      Array.isArray(config.scripts) ||
+      typeof config.scripts !== 'object'
+    ) {
+      throw new Error('The config JSON must contain a scripts object');
+    }
 
-      const result = request({
-        method: 'GET',
-        url,
-        onload: (response) => {
-          if (response.status < 200 || response.status >= 300) {
-            reject(
-              new Error(`Config request failed with status ${response.status}`),
-            );
-            return;
-          }
-
-          resolve(response.responseText);
-        },
-        onerror: () => reject(new Error('Could not load the config')),
-        ontimeout: () => reject(new Error('Config request timed out')),
-      });
-
-      result?.catch?.(reject);
-    });
+    return config;
+  };
 
   const openInTab = (url) => {
     const modernApi = typeof GM === 'object' ? GM : undefined;
@@ -92,38 +78,25 @@
     return { key, url: source.href };
   };
 
-  const loadScripts = async () => {
-    const config = JSON.parse(await requestText(configUrl));
+  const loadScripts = (config) => {
+    const modernApi = typeof GM === 'object' ? GM : undefined;
+    const scriptInfo =
+      modernApi?.info ?? (typeof GM_info === 'object' ? GM_info : undefined);
+    const ownUrls = new Set(
+      [scriptInfo?.script?.downloadURL, scriptInfo?.script?.updateURL].filter(
+        (url) => typeof url === 'string' && url !== '',
+      ),
+    );
+
     return Object.entries(config.scripts ?? {})
       .filter(([, entry]) => entry?.enabled === true)
       .map(([key, entry]) => resolveSource(key, entry))
-      .filter(({ url }) => url !== installerUrl);
+      .filter(({ key, url }) => key !== config.requires && !ownUrls.has(url));
   };
 
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.textContent = 'Install userscripts';
-  button.style.cssText = [
-    'position: fixed',
-    'right: 20px',
-    'bottom: 20px',
-    'z-index: 2147483647',
-    'padding: 10px 14px',
-    'border: 1px solid #0969da',
-    'border-radius: 6px',
-    'background: #0969da',
-    'color: white',
-    'font: 600 14px system-ui, sans-serif',
-    'cursor: pointer',
-    'box-shadow: 0 2px 8px rgb(0 0 0 / 20%)',
-  ].join(';');
-
-  button.addEventListener('click', async () => {
-    button.disabled = true;
-    button.textContent = 'Loading…';
-
+  const install = async (getConfig) => {
     try {
-      const scripts = await loadScripts();
+      const scripts = loadScripts(await getConfig());
       if (scripts.length === 0) {
         window.alert('No enabled userscripts to install.');
         return;
@@ -143,11 +116,58 @@
       }
     } catch (error) {
       window.alert(`Could not load userscripts: ${error.message}`);
-    } finally {
-      button.disabled = false;
-      button.textContent = 'Install userscripts';
     }
-  });
+  };
+
+  const configFromCurrentPage = () =>
+    parseConfig(document.body?.textContent ?? '');
+
+  const installFromCurrentPage = () => install(configFromCurrentPage);
+
+  const modernApi = typeof GM === 'object' ? GM : undefined;
+  const registerMenuCommand =
+    typeof modernApi?.registerMenuCommand === 'function'
+      ? modernApi.registerMenuCommand.bind(modernApi)
+      : typeof GM_registerMenuCommand === 'function'
+        ? GM_registerMenuCommand
+        : undefined;
+
+  if (registerMenuCommand !== undefined) {
+    registerMenuCommand(
+      'Install userscripts from this page',
+      installFromCurrentPage,
+    );
+  }
+
+  let currentPageConfig;
+  try {
+    currentPageConfig = configFromCurrentPage();
+  } catch {
+    currentPageConfig = undefined;
+  }
+
+  if (currentPageConfig === undefined) {
+    return;
+  }
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = 'Install userscripts';
+  button.style.cssText = [
+    'position: fixed',
+    'right: 20px',
+    'bottom: 20px',
+    'z-index: 2147483647',
+    'padding: 10px 14px',
+    'border: 1px solid #0969da',
+    'border-radius: 6px',
+    'background: #0969da',
+    'color: white',
+    'font: 600 14px system-ui, sans-serif',
+    'cursor: pointer',
+    'box-shadow: 0 2px 8px rgb(0 0 0 / 20%)',
+  ].join(';');
+  button.addEventListener('click', () => install(() => currentPageConfig));
 
   document.body.append(button);
 })();
