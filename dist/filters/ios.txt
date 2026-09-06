@@ -1,8 +1,8 @@
-! Checksum: pmeqUxmVJQMozuQlYUmrhg
+! Checksum: zFZ05dfEkg1t8k/6+51jGA
 ! Title: AdGuard filter
 ! Description: Lists compiled for supported platforms.
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-06T20:05:57+00:00
+! TimeUpdated: 2026-09-06T20:06:36+00:00
 ! Expires: 1 week (update frequency)
 @@||metrics.icloud.com^
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
