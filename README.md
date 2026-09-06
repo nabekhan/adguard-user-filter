@@ -13,16 +13,16 @@ Use `global` for multi-site rules. `source` is a local path or HTTPS URL.
 Optional platforms: `android`, `chromium`, `firefox`, `ios`, `linux`, `mac`,
 `safari`, and `windows`. Omit `platforms` to use all.
 
-| Device / app               | Subscription path           |
-| -------------------------- | --------------------------- |
-| AdGuard for iOS            | `dist/filters/ios.txt`      |
-| AdGuard for Android        | `dist/filters/android.txt`  |
-| AdGuard for Mac            | `dist/filters/mac.txt`      |
-| AdGuard for Windows        | `dist/filters/windows.txt`  |
-| AdGuard CLI for Linux      | `dist/filters/linux.txt`    |
-| AdGuard Mini / Safari      | `dist/filters/safari.txt`   |
-| Chromium browser extension | `dist/filters/chromium.txt` |
-| Firefox browser extension  | `dist/filters/firefox.txt`  |
+| Platform | Subscription path           |
+| -------- | --------------------------- |
+| iOS      | `dist/filters/ios.txt`      |
+| Android  | `dist/filters/android.txt`  |
+| Mac      | `dist/filters/mac.txt`      |
+| Windows  | `dist/filters/windows.txt`  |
+| Linux    | `dist/filters/linux.txt`    |
+| Safari   | `dist/filters/safari.txt`   |
+| Chromium | `dist/filters/chromium.txt` |
+| Firefox  | `dist/filters/firefox.txt`  |
 
 Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/`
 
