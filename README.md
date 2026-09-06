@@ -43,6 +43,7 @@ Open a raw userscript config page, click the bottom-right button, and confirm.
 ## Development
 
 Node 24 is required.
+`sources/filter.json` and `sources/userscripts.json` are the source of truth.
 
 ```sh
 npm ci
@@ -51,8 +52,9 @@ npm run validate
 ```
 
 `npm run format` normalizes and sorts configs, organizes local files, creates or
-removes remote patch files, and deletes empty folders. `global` and `other` sort
-last.
+removes remote patch files, and deletes empty folders. It asks before removing a
+local file that is not in config; `npm run format:prune` removes it without
+prompting. `global` and `other` sort last.
 
 `npm ci` installs the pre-commit formatting hook. Pull requests validate the
 configs and filters. Pushes to `main` rebuild `dist/`.

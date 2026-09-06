@@ -12,6 +12,7 @@
     "build": "node tools/build.mjs",
     "format": "node tools/format-config.mjs && prettier --write . --ignore-unknown",
     "format:check": "node tools/format-config.mjs --check && prettier --check . --ignore-unknown",
+    "format:prune": "node tools/format-config.mjs --prune-local && prettier --write . --ignore-unknown",
     "resolve-configs": "node tools/resolve-configs.mjs",
     "validate": "npm run resolve-configs && npm run build && npx aglint"
   },
