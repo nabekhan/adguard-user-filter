@@ -1,8 +1,8 @@
-! Checksum: RvXLXDyaZTQ70HBD52Dj0w
+! Checksum: iomE88kSzX7mJMwi/+bljA
 ! Title: Filters
 ! Description: Lists of filters for various websites.
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-06T20:21:51+00:00
+! TimeUpdated: 2026-09-06T20:22:37+00:00
 ! Expires: 1 week (update frequency)
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
 youtube.com#?#[page-subtype="channels"] ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:contains(/(^| )Shorts( |$)/i))
