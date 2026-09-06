@@ -41,7 +41,7 @@
       "category": "shopping",
       "enabled": true,
       "target": "global",
-      "url": "https://github.com/nabekhan/grocery-price-per-unit/releases/latest/download/Grocery-Price-Per-Unit.user.js"
+      "url": "https://raw.githubusercontent.com/nabekhan/grocery-price-per-unit/main/dist/Grocery-Price-Per-Unit.user.js"
     },
     "base64-autodecode": {
       "category": "tools",
