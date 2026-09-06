@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Userscript Installer
 // @namespace    https://github.com/nabekhan/filters-userscripts
-// @version      0.9.4
+// @version      0.9.5
 // @description  Opens userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/filters-userscripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js
 // @updateURL    https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js
 // @match        https://*/*
+// @inject-into  content
 // @grant        GM.openInTab
 // @grant        GM.registerMenuCommand
 // @grant        GM.xmlHttpRequest
@@ -609,11 +610,20 @@
     'color: white',
     'font: 700 13px/1 system-ui, sans-serif',
     'opacity: 0.8',
+    'touch-action: manipulation',
+    '-webkit-tap-highlight-color: transparent',
     'cursor: pointer',
     'box-shadow: 0 1px 3px rgb(0 0 0 / 25%)',
   ].join(';');
-  button.addEventListener('click', () =>
-    toggleInstaller(() => currentPageConfig),
+  const toggleCurrentPage = () => toggleInstaller(() => currentPageConfig);
+  button.addEventListener('click', toggleCurrentPage);
+  button.addEventListener(
+    'touchend',
+    (event) => {
+      event.preventDefault();
+      toggleCurrentPage();
+    },
+    { passive: false },
   );
 
   document.body.append(button);
