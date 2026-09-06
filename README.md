@@ -1,5 +1,8 @@
 # Filters and userscripts
 
+[Userscripts config](https://github.com/nabekhan/user-filter-scripts/blob/main/dist/userscripts.config.json)
+· [Filter config](https://github.com/nabekhan/user-filter-scripts/blob/main/dist/filter.config.json)
+
 Platform-specific subscriptions assembled from `filter.config.json`.
 
 ## Lists
