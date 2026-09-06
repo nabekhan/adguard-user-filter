@@ -4,14 +4,17 @@
   "homepage": "https://github.com/nabekhan/adguard-user-filter",
   "expires": "1 week",
   "lists": {
+    "siri-ai-enable": {
+      "category": "allowlists",
+      "enabled": true
+    },
     "norsagir-youtube-hide-shorts": {
+      "category": "nuisances",
       "enabled": true,
       "url": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
     },
-    "siri-ai-enable": {
-      "enabled": true
-    },
     "youtube-shorts-extras": {
+      "category": "nuisances",
       "enabled": true
     }
   }

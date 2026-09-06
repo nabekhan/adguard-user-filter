@@ -1,9 +1,10 @@
-! Checksum: G1KZrrzPygo57091Yz7VuA
+! Checksum: MMw9kelLUuicsQqrwkTfnA
 ! Title: Nabeel's AdGuard filter
 ! Description: Personal lists compiled for supported platforms.
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-06T18:40:40+00:00
+! TimeUpdated: 2026-09-06T18:41:14+00:00
 ! Expires: 1 week (update frequency)
+@@||metrics.icloud.com^
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
 youtube.com#?#[page-subtype="channels"] ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:contains(/(^| )Shorts( |$)/i))
 youtube.com##[page-subtype="subscriptions"] ytd-rich-section-renderer:has([is-shorts])
@@ -14,7 +15,6 @@ youtube.com#?#[page-subtype="search"] grid-shelf-view-model:has(yt-section-heade
 [$path=/results]m.youtube.com#?#grid-shelf-view-model:contains(Nouveautés)
 [$path=/results]m.youtube.com##grid-shelf-view-model:has(ytm-shorts-lockup-view-model)
 [$path=/results]m.youtube.com#?#ytm-video-with-context-renderer:has(ytm-thumbnail-overlay-time-status-renderer:contains(SHORTS))
-@@||metrics.icloud.com^
 youtube.com#?#ytd-guide-entry-renderer:has(yt-formatted-string:contains(/^Shorts$/i))
 youtube.com##ytd-mini-guide-entry-renderer:has([title="Shorts"])
 youtube.com#?#[page-subtype="channels"] yt-tab-shape:contains(/^Shorts$/)
