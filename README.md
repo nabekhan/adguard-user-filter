@@ -4,15 +4,27 @@ Platform-specific subscriptions assembled from `filter.config.json`.
 
 ## Lists
 
-Local entries load `lists/<name>.txt`. Remote entries specify an HTTPS `url`.
-Only entries with `"enabled": true` are included.
+Local entries specify a `file` path relative to `lists/`. The path may include
+subfolders. Remote entries specify an HTTPS `url`. Every enabled entry must
+specify exactly one of `file` or `url`.
 
 ```json
 {
   "lists": {
+    "siri-ai-enable": {
+      "category": "allowlists",
+      "enabled": true,
+      "file": "siri-ai-enable.txt"
+    },
     "norsagir-youtube-hide-shorts": {
+      "category": "nuisances",
       "enabled": true,
       "url": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
+    },
+    "youtube-shorts-extras": {
+      "category": "nuisances",
+      "enabled": true,
+      "file": "youtube/youtube-shorts-extras.txt"
     }
   }
 }

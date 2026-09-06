@@ -1,5 +1,5 @@
 import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { compile } from '@adguard/filters-compiler';
 
 const root = resolve(import.meta.dirname, '..');
@@ -9,7 +9,11 @@ const config = JSON.parse(
 const filterId = 100001;
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)
-    .map(([name, value]) => ({ name, url: value.url }));
+    .map(([name, value]) => ({
+        name,
+        file: value.file,
+        url: value.url,
+    }));
 
 for (const field of ['title', 'description', 'homepage', 'expires']) {
     if (typeof config[field] !== 'string' || config[field].trim() === '') {
@@ -17,9 +21,32 @@ for (const field of ['title', 'description', 'homepage', 'expires']) {
     }
 }
 
-for (const { name, url } of enabled) {
+const listsDir = resolve(root, 'lists');
+
+for (const { name, file, url } of enabled) {
     if (!/^[a-z0-9][a-z0-9-]*$/i.test(name)) {
         throw new Error(`Invalid list name: ${name}`);
+    }
+
+    if ((file === undefined) === (url === undefined)) {
+        throw new Error(`List ${name} must specify exactly one of file or url`);
+    }
+
+    if (file !== undefined) {
+        if (typeof file !== 'string' || file.trim() === '') {
+            throw new Error(`Invalid local file for ${name}`);
+        }
+
+        const localPath = resolve(listsDir, file);
+        const pathWithinLists = relative(listsDir, localPath);
+        if (
+            pathWithinLists === '' ||
+            pathWithinLists === '..' ||
+            pathWithinLists.startsWith(`..${sep}`) ||
+            isAbsolute(pathWithinLists)
+        ) {
+            throw new Error(`Local file for ${name} must be inside lists/`);
+        }
     }
 
     if (url !== undefined) {
@@ -45,10 +72,17 @@ const sourceDir = resolve(buildDir, 'filters');
 const platformsDir = resolve(buildDir, 'platforms');
 const distDir = resolve(root, 'dist');
 const template = [
-    ...enabled.map(({ name, url }) =>
-        url === undefined
-            ? `@include ../../../lists/${name}.txt /stripComments /ignoreTrustLevel`
-            : `@include ${JSON.stringify(new URL(url).href)} /stripComments`,
+    ...enabled.map(({ file, url }) =>
+        file === undefined
+            ? `@include ${JSON.stringify(new URL(url).href)} /stripComments`
+            : `@include ${JSON.stringify(
+                  relative(
+                      resolve(sourceDir, 'user-filter'),
+                      resolve(listsDir, file),
+                  )
+                      .split(sep)
+                      .join('/'),
+              )} /stripComments /ignoreTrustLevel`,
     ),
     '',
 ].join('\n');

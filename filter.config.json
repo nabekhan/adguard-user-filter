@@ -6,7 +6,8 @@
   "lists": {
     "siri-ai-enable": {
       "category": "allowlists",
-      "enabled": true
+      "enabled": true,
+      "file": "siri-ai-enable.txt"
     },
     "norsagir-youtube-hide-shorts": {
       "category": "nuisances",
@@ -15,7 +16,8 @@
     },
     "youtube-shorts-extras": {
       "category": "nuisances",
-      "enabled": true
+      "enabled": true,
+      "file": "youtube/youtube-shorts-extras.txt"
     }
   }
 }
