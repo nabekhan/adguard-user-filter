@@ -1,6 +1,7 @@
 # Filters and userscripts
 
 [Userscripts config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts.json)
+
 [Filter config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filter.json)
 
 ## Filters
