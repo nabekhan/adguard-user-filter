@@ -1,11 +1,15 @@
 import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { resolve } from 'node:path';
+import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { compile } from '@adguard/filters-compiler';
 
 const root = resolve(import.meta.dirname, '..');
 const config = JSON.parse(
-    await readFile(resolve(root, 'dist', 'filter.config.json'), 'utf8'),
+    await readFile(resolve(root, 'dist', 'filters', 'config.json'), 'utf8'),
 );
+const rawFiltersUrl = new URL(
+    'https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/sources/filters/',
+);
+const localFiltersDir = resolve(root, 'sources', 'filters');
 const filterId = 100001;
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)
@@ -44,12 +48,51 @@ for (const { name, url } of enabled) {
 const buildDir = resolve(root, '.build');
 const sourceDir = resolve(buildDir, 'filters');
 const platformsDir = resolve(buildDir, 'platforms');
-const distDir = resolve(root, 'dist');
+const distFiltersDir = resolve(root, 'dist', 'filters');
+const localFilterPath = (url) => {
+    const source = new URL(url);
+    if (
+        source.origin !== rawFiltersUrl.origin ||
+        !source.pathname.startsWith(rawFiltersUrl.pathname)
+    ) {
+        return undefined;
+    }
+
+    const path = source.pathname
+        .slice(rawFiltersUrl.pathname.length)
+        .split('/')
+        .map(decodeURIComponent);
+    const localPath = resolve(localFiltersDir, ...path);
+    const pathWithinDirectory = relative(localFiltersDir, localPath);
+    if (
+        pathWithinDirectory === '' ||
+        pathWithinDirectory === '..' ||
+        pathWithinDirectory.startsWith(`..${sep}`) ||
+        isAbsolute(pathWithinDirectory)
+    ) {
+        throw new Error(
+            'Resolved local filter must be inside sources/filters/',
+        );
+    }
+
+    return localPath;
+};
 const template = [
-    ...enabled.map(
-        ({ url }) =>
-            `@include ${JSON.stringify(new URL(url).href)} /stripComments`,
-    ),
+    ...enabled.map(({ url }) => {
+        const normalizedUrl = new URL(url).href;
+        const localPath = localFilterPath(normalizedUrl);
+        if (localPath === undefined) {
+            return `@include ${JSON.stringify(normalizedUrl)} /stripComments`;
+        }
+
+        const relativePath = relative(
+            resolve(sourceDir, 'user-filter'),
+            localPath,
+        )
+            .split(sep)
+            .join('/');
+        return `@include ${JSON.stringify(relativePath)} /stripComments /ignoreTrustLevel`;
+    }),
     '',
 ].join('\n');
 
@@ -118,10 +161,10 @@ const subscriptions = {
     windows: 'windows/filters/100001.txt',
 };
 
-await mkdir(distDir, { recursive: true });
+await mkdir(distFiltersDir, { recursive: true });
 for (const [name, source] of Object.entries(subscriptions)) {
     await copyFile(
         resolve(platformsDir, source),
-        resolve(distDir, `${name}.txt`),
+        resolve(distFiltersDir, `${name}.txt`),
     );
 }

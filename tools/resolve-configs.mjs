@@ -1,45 +1,150 @@
-import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
-import { isAbsolute, relative, resolve, sep } from 'node:path';
+import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
+
+import {
+    configDefinitions,
+    slugPattern,
+    websitePattern,
+} from './config-definitions.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const rawRoot =
     'https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/';
-const configs = [
-    {
-        filename: 'filter.config.json',
-        collectionName: 'lists',
-        localDirectory: 'lists',
-    },
-    {
-        filename: 'userscripts.config.json',
-        collectionName: 'scripts',
-        localDirectory: 'userscripts',
-    },
-];
+const entryFields = new Set(['category', 'enabled', 'file', 'url', 'website']);
 
-const distDir = resolve(root, 'dist');
-await mkdir(distDir, { recursive: true });
+const isObject = (value) =>
+    value !== null && typeof value === 'object' && !Array.isArray(value);
 
-for (const { filename, collectionName, localDirectory } of configs) {
-    const source = JSON.parse(await readFile(resolve(root, filename), 'utf8'));
+const requireString = (value, path) => {
+    if (typeof value !== 'string' || value.trim() === '') {
+        throw new Error(`${path} must be a non-empty string`);
+    }
+};
+
+const requireHttpsUrl = (value, path) => {
+    requireString(value, path);
+
+    let url;
+    try {
+        url = new URL(value);
+    } catch {
+        throw new Error(`${path} must be a valid URL`);
+    }
+
+    if (url.protocol !== 'https:') {
+        throw new Error(`${path} must use HTTPS`);
+    }
+
+    return url;
+};
+
+const rejectUnknownFields = (value, allowedFields, path) => {
+    const unknownFields = Object.keys(value).filter(
+        (field) => !allowedFields.has(field),
+    );
+    if (unknownFields.length > 0) {
+        throw new Error(
+            `${path} has unknown field${unknownFields.length === 1 ? '' : 's'}: ${unknownFields.join(', ')}`,
+        );
+    }
+};
+
+const readConfig = async (sourcePath) => {
+    const contents = await readFile(resolve(root, sourcePath), 'utf8');
+    try {
+        return JSON.parse(contents);
+    } catch (error) {
+        throw new Error(`${sourcePath} is not valid JSON: ${error.message}`);
+    }
+};
+
+const resolveConfig = async ({
+    sourcePath,
+    outputPath,
+    collectionName,
+    localDirectory,
+    localFileSuffix,
+    requiredStringFields,
+    optionalStringFields,
+}) => {
+    const source = await readConfig(sourcePath);
+    if (!isObject(source)) {
+        throw new Error(`${sourcePath} must contain a JSON object`);
+    }
+
+    const topLevelFields = new Set([
+        ...requiredStringFields,
+        ...optionalStringFields,
+        collectionName,
+    ]);
+    rejectUnknownFields(source, topLevelFields, sourcePath);
+
+    for (const field of requiredStringFields) {
+        requireString(source[field], `${sourcePath}.${field}`);
+    }
+    for (const field of optionalStringFields) {
+        if (source[field] !== undefined) {
+            requireString(source[field], `${sourcePath}.${field}`);
+        }
+    }
+    requireHttpsUrl(source.homepage, `${sourcePath}.homepage`);
+
+    const entries = source[collectionName];
+    if (!isObject(entries)) {
+        throw new Error(`${sourcePath}.${collectionName} must be an object`);
+    }
+
+    if (
+        source.requires !== undefined &&
+        !Object.hasOwn(entries, source.requires)
+    ) {
+        throw new Error(
+            `${sourcePath}.requires must name an entry in ${collectionName}`,
+        );
+    }
+
     const collection = {};
-
-    for (const [name, entry] of Object.entries(source[collectionName] ?? {})) {
-        if (entry === null || typeof entry !== 'object') {
-            throw new Error(`Invalid entry: ${collectionName}.${name}`);
+    for (const [name, entry] of Object.entries(entries)) {
+        const entryPath = `${sourcePath}.${collectionName}.${name}`;
+        if (!slugPattern.test(name)) {
+            throw new Error(`${entryPath} must use lowercase kebab-case`);
+        }
+        if (!isObject(entry)) {
+            throw new Error(`${entryPath} must be an object`);
+        }
+        rejectUnknownFields(entry, entryFields, entryPath);
+        requireString(entry.category, `${entryPath}.category`);
+        if (!slugPattern.test(entry.category)) {
+            throw new Error(
+                `${entryPath}.category must use lowercase kebab-case`,
+            );
+        }
+        requireString(entry.website, `${entryPath}.website`);
+        if (!websitePattern.test(entry.website)) {
+            throw new Error(
+                `${entryPath}.website must use a lowercase filesystem-safe label`,
+            );
+        }
+        if (typeof entry.enabled !== 'boolean') {
+            throw new Error(`${entryPath}.enabled must be a boolean`);
         }
 
         const { file, url, ...settings } = entry;
         if ((file === undefined) === (url === undefined)) {
             throw new Error(
-                `${collectionName}.${name} must specify exactly one of file or url`,
+                `${entryPath} must specify exactly one of file or url`,
             );
         }
 
         let resolvedUrl;
         if (file !== undefined) {
-            if (typeof file !== 'string' || file.trim() === '') {
-                throw new Error(`Invalid local file for ${name}`);
+            requireString(file, `${entryPath}.file`);
+            const filename = `${name}${localFileSuffix}`;
+            const expectedFile = `${entry.website}/${entry.category}/${filename}`;
+            if (file !== expectedFile) {
+                throw new Error(
+                    `${entryPath}.file must be organized as ${expectedFile}`,
+                );
             }
 
             const directoryPath = resolve(root, localDirectory);
@@ -52,40 +157,53 @@ for (const { filename, collectionName, localDirectory } of configs) {
                 isAbsolute(pathWithinDirectory)
             ) {
                 throw new Error(
-                    `Local file for ${name} must be inside ${localDirectory}/`,
+                    `${entryPath}.file must be inside ${localDirectory}/`,
                 );
             }
 
-            await access(localPath);
+            let fileStatus;
+            try {
+                fileStatus = await stat(localPath);
+            } catch {
+                throw new Error(`${entryPath}.file does not exist`);
+            }
+            if (!fileStatus.isFile()) {
+                throw new Error(`${entryPath}.file must point to a file`);
+            }
+
             const encodedPath = pathWithinDirectory
                 .split(sep)
                 .map(encodeURIComponent)
                 .join('/');
             resolvedUrl = new URL(`${localDirectory}/${encodedPath}`, rawRoot);
         } else {
-            if (typeof url !== 'string' || url.trim() === '') {
-                throw new Error(`Invalid remote URL for ${name}`);
-            }
-
-            resolvedUrl = new URL(url);
-        }
-
-        if (resolvedUrl.protocol !== 'https:') {
-            throw new Error(`URL for ${name} must use HTTPS`);
+            resolvedUrl = requireHttpsUrl(url, `${entryPath}.url`);
         }
 
         if (
             collectionName === 'scripts' &&
             !resolvedUrl.pathname.endsWith('.user.js')
         ) {
-            throw new Error(`Userscript ${name} must point to a .user.js file`);
+            throw new Error(`${entryPath} must point to a .user.js file`);
         }
 
         collection[name] = { ...settings, url: resolvedUrl.href };
     }
 
-    await writeFile(
-        resolve(distDir, filename),
-        `${JSON.stringify({ ...source, [collectionName]: collection }, null, 2)}\n`,
-    );
+    return {
+        outputPath,
+        value: { ...source, [collectionName]: collection },
+    };
+};
+
+const outputs = [];
+for (const definition of configDefinitions) {
+    outputs.push(await resolveConfig(definition));
+}
+
+const distDir = resolve(root, 'dist');
+for (const { outputPath, value } of outputs) {
+    const destination = resolve(distDir, outputPath);
+    await mkdir(dirname(destination), { recursive: true });
+    await writeFile(destination, `${JSON.stringify(value, null, 2)}\n`);
 }

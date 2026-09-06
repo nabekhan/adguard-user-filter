@@ -4,20 +4,23 @@
   "homepage": "https://github.com/nabekhan/user-filter-scripts",
   "expires": "1 week",
   "lists": {
+    "siri-ai-enable": {
+      "category": "other",
+      "enabled": true,
+      "website": "icloud",
+      "url": "https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/sources/filters/icloud/other/siri-ai-enable.txt"
+    },
     "norsagir-youtube-hide-shorts": {
       "category": "nuisances",
       "enabled": true,
+      "website": "youtube",
       "url": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
     },
     "norsagir-youtube-shorts-extras": {
       "category": "nuisances",
       "enabled": true,
-      "url": "https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/lists/youtube/youtube-shorts-extras.txt"
-    },
-    "siri-ai-enable": {
-      "category": "other",
-      "enabled": true,
-      "url": "https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/lists/siri-ai-enable.txt"
+      "website": "youtube",
+      "url": "https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/sources/filters/youtube/nuisances/norsagir-youtube-shorts-extras.txt"
     }
   }
 }

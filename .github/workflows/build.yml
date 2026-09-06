@@ -20,7 +20,7 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - run: npm run format
+      - run: npm run format:check
       - run: npm run resolve-configs
       - run: npm run build
       - run: npx aglint
