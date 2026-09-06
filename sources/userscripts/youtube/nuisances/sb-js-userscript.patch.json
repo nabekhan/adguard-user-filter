@@ -1,4 +1,5 @@
 {
+  "source": "https://raw.githubusercontent.com/mchangrh/sb.js/main/docs/sb.user.js",
   "replacements": [
     {
       "pattern": "^// @match\\s+https://www\\.youtube\\.com/watch\\*$",

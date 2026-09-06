@@ -128,6 +128,9 @@ for (const { category, name, platforms, target, url } of enabled) {
             resolve(localFiltersDir, patchRelativePath),
             patchLabel,
         );
+        if (patch.source !== normalizedUrl) {
+            throw new Error(`${patchLabel}.source does not match ${name}`);
+        }
         if (patch.replacements.length > 0) {
             const contents = await fetchRemoteText(
                 normalizedUrl,

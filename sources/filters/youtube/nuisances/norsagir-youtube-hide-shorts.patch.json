@@ -1,4 +1,5 @@
 {
+  "source": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt",
   "replacements": [
     {
       "pattern": "^!(?=(?:\\[\\$path=[^\\]]+\\])?(?:m\\.)?youtube\\.com##)",

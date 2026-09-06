@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 const isObject = (value) =>
     value !== null && typeof value === 'object' && !Array.isArray(value);
 
-export const emptyRemotePatch = { replacements: [] };
+export const createRemotePatch = (source) => ({ source, replacements: [] });
 
 export const remotePatchRelativePath = (target, category, name) =>
     `${target}/${category}/${name}.patch.json`;
@@ -30,7 +30,7 @@ export const readRemotePatch = async (path, label) => {
         throw new Error(`${label} must contain a JSON object`);
     }
     const unknownFields = Object.keys(patch).filter(
-        (field) => field !== 'replacements',
+        (field) => !['source', 'replacements'].includes(field),
     );
     if (unknownFields.length > 0) {
         throw new Error(
@@ -39,6 +39,18 @@ export const readRemotePatch = async (path, label) => {
     }
     if (!Array.isArray(patch.replacements)) {
         throw new Error(`${label}.replacements must be an array`);
+    }
+    if (typeof patch.source !== 'string' || patch.source.trim() === '') {
+        throw new Error(`${label}.source must be a non-empty string`);
+    }
+    let source;
+    try {
+        source = new URL(patch.source);
+    } catch {
+        throw new Error(`${label}.source must be a valid URL`);
+    }
+    if (source.protocol !== 'https:') {
+        throw new Error(`${label}.source must use HTTPS`);
     }
 
     const replacements = patch.replacements.map((replacement, index) => {
@@ -80,7 +92,7 @@ export const readRemotePatch = async (path, label) => {
         };
     });
 
-    return { replacements };
+    return { source: source.href, replacements };
 };
 
 export const fetchRemoteText = async (url, label) => {

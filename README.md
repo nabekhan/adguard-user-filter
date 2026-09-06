@@ -32,7 +32,7 @@ Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/
 - Config: `sources/userscripts.json`
 - Local files: `sources/userscripts/<target>/<category>/<key>.user.js`
 - Remote patches: `sources/userscripts/<target>/<category>/<key>.patch.json`
-- Patched files: `dist/userscripts/<target>/<category>/<key>.user.js`
+- Patched files: `dist/userscripts/<key>.user.js`
 - Generated config: `dist/userscripts.json`
 
 Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js).

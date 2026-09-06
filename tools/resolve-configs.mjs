@@ -222,13 +222,18 @@ const resolveConfig = async ({
                 resolve(root, localDirectory, patchRelativePath),
                 patchLabel,
             );
+            if (patch.source !== resolvedUrl.href) {
+                throw new Error(
+                    `${patchLabel}.source must match ${entryPath}.source`,
+                );
+            }
 
             if (collectionName === 'scripts' && patch.replacements.length > 0) {
                 const remoteContents = await fetchRemoteText(
                     resolvedUrl,
                     `${entryPath}.source`,
                 );
-                const outputRelativePath = `userscripts/${entry.target}/${entry.category}/${name}${localFileSuffix}`;
+                const outputRelativePath = `userscripts/${name}${localFileSuffix}`;
                 generatedFiles.push({
                     outputRelativePath,
                     contents: applyRemotePatch(
