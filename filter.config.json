@@ -1,12 +1,15 @@
 {
   "title": "Nabeel's AdGuard filter",
-  "description": "AdGuard rules compiled for each supported platform.",
+  "description": "Personal lists compiled for supported platforms.",
   "homepage": "https://github.com/nabekhan/adguard-user-filter",
   "expires": "1 week",
   "lists": {
     "norsagir-youtube-hide-shorts": {
       "enabled": true,
       "url": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
+    },
+    "siri-ai-enable": {
+      "enabled": true
     },
     "youtube-shorts-extras": {
       "enabled": true
