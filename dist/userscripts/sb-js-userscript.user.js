@@ -9,6 +9,7 @@
 // @match        https://*.youtube.com/*
 // @connect      sponsor.ajay.app
 // @grant        none
+// @updateURL    https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts/sb-js-userscript.user.js
 // ==/UserScript==
 /* START OF SETTINGS */
 
