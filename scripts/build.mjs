@@ -7,7 +7,7 @@ const config = JSON.parse(await readFile(resolve(root, 'filter.config.json'), 'u
 const filterId = 100001;
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)
-    .map(([name]) => name);
+    .map(([name, value]) => ({ name, url: value.url }));
 
 for (const field of ['title', 'description', 'homepage', 'expires']) {
     if (typeof config[field] !== 'string' || config[field].trim() === '') {
@@ -15,9 +15,26 @@ for (const field of ['title', 'description', 'homepage', 'expires']) {
     }
 }
 
-for (const name of enabled) {
+for (const { name, url } of enabled) {
     if (!/^[a-z0-9][a-z0-9-]*$/i.test(name)) {
         throw new Error(`Invalid list name: ${name}`);
+    }
+
+    if (url !== undefined) {
+        if (typeof url !== 'string' || url.trim() === '') {
+            throw new Error(`Invalid remote list URL for ${name}`);
+        }
+
+        let parsedUrl;
+        try {
+            parsedUrl = new URL(url);
+        } catch {
+            throw new Error(`Invalid remote list URL for ${name}: ${url}`);
+        }
+
+        if (parsedUrl.protocol !== 'https:') {
+            throw new Error(`Remote list URL for ${name} must use HTTPS`);
+        }
     }
 }
 
@@ -26,7 +43,11 @@ const sourceDir = resolve(buildDir, 'filters');
 const platformsDir = resolve(buildDir, 'platforms');
 const distDir = resolve(root, 'dist');
 const template = [
-    ...enabled.map((name) => `@include ../../../lists/${name}.txt /ignoreTrustLevel`),
+    ...enabled.map(({ name, url }) => (
+        url === undefined
+            ? `@include ../../../lists/${name}.txt /ignoreTrustLevel`
+            : `@include ${JSON.stringify(new URL(url).href)}`
+    )),
     '',
 ].join('\n');
 

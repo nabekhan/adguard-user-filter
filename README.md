@@ -23,6 +23,25 @@ Create another list at `lists/name.txt`, then add its `enabled` Boolean to the
 config. The starter YouTube Shorts list is deliberately comment-only, so it does
 not block anything until rules are added.
 
+To include a remote list, give it a unique name and an HTTPS `url`:
+
+```json
+{
+  "lists": {
+    "youtube-shorts": { "enabled": true },
+    "norsagir-youtube-hide-shorts": {
+      "enabled": true,
+      "url": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
+    }
+  }
+}
+```
+
+Remote lists are downloaded when the filter is built and compiled into every
+compatible platform subscription. Pin the URL to a release or commit when you
+need reproducible builds; a URL that tracks the latest version can change the
+generated subscriptions without a corresponding source change here.
+
 ## Build
 
 Node 22 is required.
