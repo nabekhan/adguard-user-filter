@@ -1,8 +1,8 @@
-! Checksum: XZWoo9iKLkcKSsbQC8wuaQ
+! Checksum: mGW1P3f9IYvciGHXTgyYhA
 ! Title: Nabeel's AdGuard filter
 ! Description: AdGuard rules compiled for each supported platform.
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-06T18:12:46+00:00
+! TimeUpdated: 2026-09-06T18:13:14+00:00
 ! Expires: 12 hours (update frequency)
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
 youtube.com#?#[page-subtype="channels"] ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:contains(/(^| )Shorts( |$)/i))
