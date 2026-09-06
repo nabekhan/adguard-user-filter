@@ -1,13 +1,13 @@
 # Filters and userscripts
 
-[Userscripts config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts/config.json)
-· [Filter config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filters/config.json)
+[Userscripts config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts.json)
+· [Filter config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filter.json)
 
 ## Filters
 
-- Config: `config/filter.json`
+- Config: `sources/filter.json`
 - Local files: `sources/filters/<target>/<category>/<key>.txt`
-- Generated config: `dist/filters/config.json`
+- Generated config: `dist/filter.json`
 
 Use `global` for multi-site rules. `source` is a local path or HTTPS URL.
 Optional platforms: `android`, `chromium`, `firefox`, `ios`, `linux`, `mac`,
@@ -28,9 +28,9 @@ Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/
 
 ## Userscripts
 
-- Config: `config/userscripts.json`
+- Config: `sources/userscripts.json`
 - Local files: `sources/userscripts/<target>/<category>/<key>.user.js`
-- Generated config: `dist/userscripts/config.json`
+- Generated config: `dist/userscripts.json`
 
 Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js).
 Open a raw userscript config page, click the bottom-right button, and confirm.

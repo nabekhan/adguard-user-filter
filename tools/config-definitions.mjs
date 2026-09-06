@@ -12,8 +12,8 @@ export const platformNames = Object.keys(filterPlatformFlags);
 
 export const configDefinitions = [
     {
-        sourcePath: 'config/filter.json',
-        outputPath: 'filters/config.json',
+        sourcePath: 'sources/filter.json',
+        outputPath: 'filter.json',
         collectionName: 'lists',
         localDirectory: 'sources/filters',
         localFileSuffix: '.txt',
@@ -23,8 +23,8 @@ export const configDefinitions = [
         optionalStringFields: [],
     },
     {
-        sourcePath: 'config/userscripts.json',
-        outputPath: 'userscripts/config.json',
+        sourcePath: 'sources/userscripts.json',
+        outputPath: 'userscripts.json',
         collectionName: 'scripts',
         localDirectory: 'sources/userscripts',
         localFileSuffix: '.user.js',

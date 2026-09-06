@@ -6,7 +6,7 @@ import { filterPlatformFlags } from './config-definitions.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const config = JSON.parse(
-    await readFile(resolve(root, 'dist', 'filters', 'config.json'), 'utf8'),
+    await readFile(resolve(root, 'dist', 'filter.json'), 'utf8'),
 );
 const rawFiltersUrl = new URL(
     'https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/filters/',
