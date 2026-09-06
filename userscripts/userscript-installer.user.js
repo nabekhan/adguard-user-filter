@@ -1,7 +1,7 @@
 // ==UserScript==
-// @name         Personal Userscript Installer
+// @name         Userscript Installer
 // @namespace    https://github.com/nabekhan/user-filter-scripts
-// @version      0.3.2
+// @version      0.3.3
 // @description  Installs enabled userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/user-filter-scripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/userscripts/userscript-installer.user.js

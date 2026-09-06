@@ -7,12 +7,12 @@
     "node": ">=22"
   },
   "scripts": {
-    "prepare": "node scripts/install-git-hooks.mjs",
+    "prepare": "node tools/install-git-hooks.mjs",
     "prebuild": "npm run format:check",
-    "build": "node scripts/build.mjs",
-    "format": "node scripts/format-config.mjs && prettier --write . --ignore-unknown",
-    "format:check": "node scripts/format-config.mjs --check && prettier --check . --ignore-unknown",
-    "resolve-configs": "node scripts/resolve-configs.mjs",
+    "build": "node tools/build.mjs",
+    "format": "node tools/format-config.mjs && prettier --write . --ignore-unknown",
+    "format:check": "node tools/format-config.mjs --check && prettier --check . --ignore-unknown",
+    "resolve-configs": "node tools/resolve-configs.mjs",
     "validate": "npm run resolve-configs && npm run build && npx aglint"
   },
   "dependencies": {

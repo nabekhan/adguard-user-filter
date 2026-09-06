@@ -1,5 +1,5 @@
 {
-  "title": "Personal userscripts",
+  "title": "Userscripts",
   "description": "Userscripts installed from local and remote sources.",
   "homepage": "https://github.com/nabekhan/user-filter-scripts",
   "requires": "userscript-installer",
