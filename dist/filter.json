@@ -19,12 +19,6 @@
       "enabled": true,
       "target": "youtube",
       "url": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
-    },
-    "norsagir-youtube-shorts-extras": {
-      "category": "nuisances",
-      "enabled": true,
-      "target": "youtube",
-      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/filters/youtube/nuisances/norsagir-youtube-shorts-extras.txt"
     }
   }
 }
