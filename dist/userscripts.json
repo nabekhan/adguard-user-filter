@@ -53,7 +53,7 @@
       "category": "tools",
       "enabled": true,
       "target": "global",
-      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js"
+      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js"
     }
   }
 }
