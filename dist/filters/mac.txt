@@ -1,8 +1,8 @@
-! Checksum: g0X2vyuaie5McnLR/5NkGg
+! Checksum: toKwwAPSqR9hZMhpBfbW0Q
 ! Title: Filters
 ! Description: Lists of filters for various websites.
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-06T23:53:22+00:00
+! TimeUpdated: 2026-09-06T23:56:29+00:00
 ! Expires: 12 hours (update frequency)
 @@||metrics.icloud.com^
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
