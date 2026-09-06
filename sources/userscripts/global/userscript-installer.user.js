@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Userscript Installer
 // @namespace    https://github.com/nabekhan/filters-userscripts
-// @version      0.9.0
+// @version      0.9.1
 // @description  Opens userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/filters-userscripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js
@@ -546,16 +546,25 @@
         marker.title = `Go to ${scripts[item].key}`;
         marker.setAttribute('aria-label', marker.title);
         marker.style.cssText = [
-          'height: 3px',
+          'height: 13px',
           'flex: 1',
           'padding: 5px 0',
           'border: 0',
-          'border-radius: 2px',
-          `background: ${item === index ? 'CanvasText' : '#8c959f'}`,
-          'background-clip: content-box',
-          `opacity: ${item === index ? '1' : '0.45'}`,
+          'background: transparent',
+          'appearance: none',
           'cursor: pointer',
         ].join(';');
+        const dash = document.createElement('span');
+        dash.style.cssText = [
+          'display: block',
+          'width: 100%',
+          'height: 3px',
+          'border-radius: 2px',
+          `background: ${item === index ? 'CanvasText' : '#8c959f'}`,
+          `opacity: ${item === index ? '1' : '0.45'}`,
+          'pointer-events: none',
+        ].join(';');
+        marker.append(dash);
         marker.addEventListener('click', () => {
           index = item;
           render();
