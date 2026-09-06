@@ -1,6 +1,6 @@
 {
-  "title": "AdGuard filter",
-  "description": "Lists compiled for supported platforms.",
+  "title": "Filters",
+  "description": "Lists of filters for various websites.",
   "homepage": "https://github.com/nabekhan/user-filter-scripts",
   "expires": "1 week",
   "lists": {
