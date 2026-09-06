@@ -85,6 +85,34 @@ const readConfig = async (sourcePath) => {
     }
 };
 
+const setUserscriptUpdateUrls = (contents, url, label) => {
+    const start = /^\/\/ ==UserScript==(?=\r?$)/m.exec(contents);
+    const end = /^\/\/ ==\/UserScript==(?=\r?$)/m.exec(contents);
+    if (start === null || end === null || end.index <= start.index) {
+        throw new Error(`${label} must contain a userscript metadata block`);
+    }
+
+    const newline = contents.includes('\r\n') ? '\r\n' : '\n';
+    let metadata = contents.slice(start.index, end.index);
+    const setField = (field, required) => {
+        const pattern = new RegExp(
+            `^//[ \\t]+@${field}(?:[ \\t]+.*)?(?=\\r?$)`,
+            'gm',
+        );
+        const line = `// ${`@${field}`.padEnd(14)}${url}`;
+        if (pattern.test(metadata)) {
+            pattern.lastIndex = 0;
+            metadata = metadata.replace(pattern, line);
+        } else if (required) {
+            metadata += `${metadata.endsWith('\n') ? '' : newline}${line}${newline}`;
+        }
+    };
+
+    setField('updateURL', true);
+    setField('downloadURL', false);
+    return `${contents.slice(0, start.index)}${metadata}${contents.slice(end.index)}`;
+};
+
 const resolveConfig = async ({
     sourcePath,
     outputPath,
@@ -233,15 +261,24 @@ const resolveConfig = async ({
                     `${entryPath}.source`,
                 );
                 const outputRelativePath = `userscripts/${name}${localFileSuffix}`;
+                const outputUrl = new URL(
+                    `dist/${outputRelativePath}`,
+                    rawRoot,
+                );
+                const patchedContents = applyRemotePatch(
+                    remoteContents,
+                    patch,
+                    patchLabel,
+                );
                 generatedFiles.push({
                     outputRelativePath,
-                    contents: applyRemotePatch(
-                        remoteContents,
-                        patch,
+                    contents: setUserscriptUpdateUrls(
+                        patchedContents,
+                        outputUrl.href,
                         patchLabel,
                     ),
                 });
-                resolvedUrl = new URL(`dist/${outputRelativePath}`, rawRoot);
+                resolvedUrl = outputUrl;
             }
         }
 
