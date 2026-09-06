@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Userscript Installer
 // @namespace    https://github.com/nabekhan/filters-userscripts
-// @version      0.9.2
+// @version      0.9.3
 // @description  Opens userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/filters-userscripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js
@@ -195,10 +195,19 @@
 
   const downloadScripts = async (scripts) => {
     const files = await Promise.all(
-      scripts.map(async (script) => ({
-        name: `${script.key}.user.js`,
-        contents: await fetchText(script.url, script.key),
-      })),
+      scripts.map(async (script) => {
+        const contents = await fetchText(script.url, script.key);
+        const name =
+          contents.match(/^\/\/\s*@name\s+(.+?)\s*$/m)?.[1] ?? script.key;
+        const filename = name
+          .trim()
+          .replace(/[<>:"/\\|?*\u0000-\u001f]/g, '-')
+          .replace(/[. ]+$/g, '');
+        return {
+          contents,
+          name: `${filename || script.key}.user.js`,
+        };
+      }),
     );
     return createZip(files);
   };
