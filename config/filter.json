@@ -7,21 +7,21 @@
     "siri-ai-enable": {
       "category": "other",
       "enabled": true,
-      "file": "icloud/other/siri-ai-enable.txt",
       "platforms": ["ios", "mac"],
-      "website": "icloud"
+      "target": "icloud",
+      "source": "icloud/other/siri-ai-enable.txt"
     },
     "norsagir-youtube-hide-shorts": {
       "category": "nuisances",
       "enabled": true,
-      "website": "youtube",
-      "url": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
+      "target": "youtube",
+      "source": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
     },
     "norsagir-youtube-shorts-extras": {
       "category": "nuisances",
       "enabled": true,
-      "file": "youtube/nuisances/norsagir-youtube-shorts-extras.txt",
-      "website": "youtube"
+      "target": "youtube",
+      "source": "youtube/nuisances/norsagir-youtube-shorts-extras.txt"
     }
   }
 }

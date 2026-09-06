@@ -7,7 +7,7 @@
     "siri-ai-enable": {
       "category": "other",
       "enabled": true,
-      "website": "icloud",
+      "target": "icloud",
       "platforms": [
         "adguard_app_ios",
         "adguard_app_mac"
@@ -17,13 +17,13 @@
     "norsagir-youtube-hide-shorts": {
       "category": "nuisances",
       "enabled": true,
-      "website": "youtube",
+      "target": "youtube",
       "url": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
     },
     "norsagir-youtube-shorts-extras": {
       "category": "nuisances",
       "enabled": true,
-      "website": "youtube",
+      "target": "youtube",
       "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/filters/youtube/nuisances/norsagir-youtube-shorts-extras.txt"
     }
   }

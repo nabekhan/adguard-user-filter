@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Userscript Installer
 // @namespace    https://github.com/nabekhan/filters-userscripts
-// @version      0.4.0
+// @version      0.5.0
 // @description  Installs enabled userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/filters-userscripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js
@@ -94,28 +94,113 @@
       .filter(({ key, url }) => key !== config.requires && !ownUrls.has(url));
   };
 
+  let panel;
+
+  const closePanel = () => {
+    panel?.remove();
+    panel = undefined;
+  };
+
+  const createPanel = () => {
+    closePanel();
+    panel = document.createElement('div');
+    panel.setAttribute('role', 'dialog');
+    panel.style.cssText = [
+      'position: fixed',
+      'right: 8px',
+      'bottom: 44px',
+      'z-index: 2147483647',
+      'box-sizing: border-box',
+      'width: min(300px, calc(100vw - 16px))',
+      'max-height: min(400px, calc(100vh - 60px))',
+      'overflow: auto',
+      'padding: 12px',
+      'border: 1px solid #8c959f',
+      'border-radius: 8px',
+      'background: Canvas',
+      'color: CanvasText',
+      'font: 13px/1.4 system-ui, sans-serif',
+      'box-shadow: 0 4px 16px rgb(0 0 0 / 25%)',
+    ].join(';');
+    document.body.append(panel);
+    return panel;
+  };
+
+  const createAction = (label, primary, action) => {
+    const actionButton = document.createElement('button');
+    actionButton.type = 'button';
+    actionButton.textContent = label;
+    actionButton.style.cssText = [
+      'padding: 5px 10px',
+      `border: 1px solid ${primary ? '#0969da' : '#8c959f'}`,
+      'border-radius: 6px',
+      `background: ${primary ? '#0969da' : 'Canvas'}`,
+      `color: ${primary ? 'white' : 'CanvasText'}`,
+      'font: 600 13px/1.2 system-ui, sans-serif',
+      'cursor: pointer',
+    ].join(';');
+    actionButton.addEventListener('click', action);
+    return actionButton;
+  };
+
+  const showMessage = (message) => {
+    const messagePanel = createPanel();
+    const text = document.createElement('div');
+    text.textContent = message;
+    messagePanel.append(text);
+
+    const actions = document.createElement('div');
+    actions.style.cssText =
+      'display: flex; justify-content: flex-end; margin-top: 10px';
+    actions.append(createAction('Close', false, closePanel));
+    messagePanel.append(actions);
+  };
+
+  const showInstallPanel = (scripts) => {
+    const installPanel = createPanel();
+    installPanel.setAttribute('aria-label', 'Install userscripts');
+
+    const title = document.createElement('div');
+    title.textContent = `Install ${scripts.length} userscript${
+      scripts.length === 1 ? '' : 's'
+    }?`;
+    title.style.fontWeight = '600';
+    installPanel.append(title);
+
+    const list = document.createElement('ul');
+    list.style.cssText = 'margin: 8px 0; padding-left: 20px';
+    for (const { key } of scripts) {
+      const item = document.createElement('li');
+      item.textContent = key;
+      list.append(item);
+    }
+    installPanel.append(list);
+
+    const actions = document.createElement('div');
+    actions.style.cssText =
+      'display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px';
+    actions.append(
+      createAction('Cancel', false, closePanel),
+      createAction('Install', true, () => {
+        for (const { url } of scripts) {
+          openInTab(url);
+        }
+        closePanel();
+      }),
+    );
+    installPanel.append(actions);
+  };
+
   const install = async (getConfig) => {
     try {
       const scripts = loadScripts(await getConfig());
       if (scripts.length === 0) {
-        window.alert('No enabled userscripts to install.');
+        showMessage('No enabled userscripts.');
         return;
       }
-
-      const names = scripts.map(({ key }) => `• ${key}`).join('\n');
-      const confirmed = window.confirm(
-        `Valid userscript config. Install ${scripts.length} script${
-          scripts.length === 1 ? '' : 's'
-        }?\n\n${names}`,
-      );
-
-      if (confirmed) {
-        for (const { url } of scripts) {
-          openInTab(url);
-        }
-      }
+      showInstallPanel(scripts);
     } catch (error) {
-      window.alert(`Could not load userscripts: ${error.message}`);
+      showMessage(`Could not load userscripts: ${error.message}`);
     }
   };
 

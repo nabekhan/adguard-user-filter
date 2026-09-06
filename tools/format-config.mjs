@@ -11,7 +11,7 @@ import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import slugifyText from '@sindresorhus/slugify';
 import { format as formatWithPrettier } from 'prettier';
 
-import { configDefinitions, websitePattern } from './config-definitions.mjs';
+import { configDefinitions, targetPattern } from './config-definitions.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const collator = new Intl.Collator('en', {
@@ -32,27 +32,42 @@ const normalizeSlug = (value, path) => {
     return slug;
 };
 
-const normalizeWebsite = (value, path) => {
+const normalizeTarget = (value, path) => {
     if (typeof value !== 'string') {
         throw new Error(`${path} must be a string`);
     }
 
-    const website = slugifyText(value.trim().toLowerCase());
-    if (!websitePattern.test(website)) {
+    const target = slugifyText(value.trim().toLowerCase());
+    if (!targetPattern.test(target)) {
         throw new Error(`${path} must be a non-empty filesystem-safe label`);
     }
 
-    return website;
+    return target;
 };
 
-const requireFile = (value, suffix, path) => {
+const classifySource = (value, suffix, path) => {
     if (typeof value !== 'string' || value.trim() === '') {
         throw new Error(`${path} must be a non-empty string`);
+    }
+
+    if (/^[a-z][a-z\d+.-]*:/i.test(value)) {
+        let url;
+        try {
+            url = new URL(value);
+        } catch {
+            throw new Error(`${path} must be a valid URL or local path`);
+        }
+        if (url.protocol !== 'https:') {
+            throw new Error(`${path} URL must use HTTPS`);
+        }
+        return { local: false, value };
     }
 
     if (!value.toLowerCase().endsWith(suffix)) {
         throw new Error(`${path} must end with ${suffix}`);
     }
+
+    return { local: true, value };
 };
 
 const normalizePlatforms = (value, allowedPlatforms, path) => {
@@ -122,40 +137,56 @@ const normalizeCollection = (
 
         const entryPath = `${path}.${name}`;
         const category = normalizeSlug(value.category, `${entryPath}.category`);
-        const website = normalizeWebsite(value.website, `${entryPath}.website`);
-        let normalizedValue = { ...value, category, website };
-        if (value.platforms !== undefined) {
-            normalizedValue = {
-                ...normalizedValue,
-                platforms: normalizePlatforms(
-                    value.platforms,
-                    allowedPlatforms,
-                    `${entryPath}.platforms`,
-                ),
-            };
-        }
-        if (value.file !== undefined) {
-            requireFile(value.file, localFileSuffix, `${entryPath}.file`);
-            const file = `${website}/${category}/${key}${localFileSuffix}`;
+        const target = normalizeTarget(value.target, `${entryPath}.target`);
+        const source = classifySource(
+            value.source,
+            localFileSuffix,
+            `${entryPath}.source`,
+        );
+        const {
+            category: ignoredCategory,
+            enabled,
+            platforms: ignoredPlatforms,
+            source: ignoredSource,
+            target: ignoredTarget,
+            ...settings
+        } = value;
+        const platforms =
+            value.platforms === undefined
+                ? undefined
+                : normalizePlatforms(
+                      value.platforms,
+                      allowedPlatforms,
+                      `${entryPath}.platforms`,
+                  );
+        let normalizedSource = source.value;
+        if (source.local) {
+            normalizedSource = `${target}/${category}/${key}${localFileSuffix}`;
 
-            if (file !== value.file) {
+            if (normalizedSource !== source.value) {
                 moves.push({
                     source: resolveWithin(
                         localDirectory,
-                        value.file,
-                        `${entryPath}.file`,
+                        source.value,
+                        `${entryPath}.source`,
                     ),
                     destination: resolveWithin(
                         localDirectory,
-                        file,
-                        `${entryPath}.file`,
+                        normalizedSource,
+                        `${entryPath}.source`,
                     ),
-                    label: `${entryPath}.file`,
+                    label: `${entryPath}.source`,
                 });
             }
-
-            normalizedValue = { ...normalizedValue, file };
         }
+        const normalizedValue = {
+            category,
+            enabled,
+            ...(platforms === undefined ? {} : { platforms }),
+            ...settings,
+            target,
+            source: normalizedSource,
+        };
 
         originalsBySlug.set(key, name);
         slugsByOriginal.set(name, key);
@@ -167,7 +198,7 @@ const normalizeCollection = (
         collator.compare(left, right);
     normalized.sort((left, right) => {
         return (
-            compareWithLast(left[1].website, right[1].website, 'global') ||
+            compareWithLast(left[1].target, right[1].target, 'global') ||
             compareWithLast(left[1].category, right[1].category, 'other') ||
             collator.compare(left[0], right[0])
         );

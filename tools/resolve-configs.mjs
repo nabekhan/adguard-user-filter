@@ -4,13 +4,13 @@ import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import {
     configDefinitions,
     slugPattern,
-    websitePattern,
+    targetPattern,
 } from './config-definitions.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const rawRoot =
     'https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/';
-const entryFields = new Set(['category', 'enabled', 'file', 'url', 'website']);
+const entryFields = new Set(['category', 'enabled', 'source', 'target']);
 
 const isObject = (value) =>
     value !== null && typeof value === 'object' && !Array.isArray(value);
@@ -146,10 +146,10 @@ const resolveConfig = async ({
                 `${entryPath}.category must use lowercase kebab-case`,
             );
         }
-        requireString(entry.website, `${entryPath}.website`);
-        if (!websitePattern.test(entry.website)) {
+        requireString(entry.target, `${entryPath}.target`);
+        if (!targetPattern.test(entry.target)) {
             throw new Error(
-                `${entryPath}.website must use a lowercase filesystem-safe label`,
+                `${entryPath}.target must use a lowercase filesystem-safe label`,
             );
         }
         if (typeof entry.enabled !== 'boolean') {
@@ -161,26 +161,21 @@ const resolveConfig = async ({
             `${entryPath}.platforms`,
         );
 
-        const { file, platforms, url, ...settings } = entry;
-        if ((file === undefined) === (url === undefined)) {
-            throw new Error(
-                `${entryPath} must specify exactly one of file or url`,
-            );
-        }
+        const { platforms, source: entrySource, ...settings } = entry;
+        requireString(entrySource, `${entryPath}.source`);
 
         let resolvedUrl;
-        if (file !== undefined) {
-            requireString(file, `${entryPath}.file`);
+        if (!/^[a-z][a-z\d+.-]*:/i.test(entrySource)) {
             const filename = `${name}${localFileSuffix}`;
-            const expectedFile = `${entry.website}/${entry.category}/${filename}`;
-            if (file !== expectedFile) {
+            const expectedFile = `${entry.target}/${entry.category}/${filename}`;
+            if (entrySource !== expectedFile) {
                 throw new Error(
-                    `${entryPath}.file must be organized as ${expectedFile}`,
+                    `${entryPath}.source must be organized as ${expectedFile}`,
                 );
             }
 
             const directoryPath = resolve(root, localDirectory);
-            const localPath = resolve(directoryPath, file);
+            const localPath = resolve(directoryPath, entrySource);
             const pathWithinDirectory = relative(directoryPath, localPath);
             if (
                 pathWithinDirectory === '' ||
@@ -189,7 +184,7 @@ const resolveConfig = async ({
                 isAbsolute(pathWithinDirectory)
             ) {
                 throw new Error(
-                    `${entryPath}.file must be inside ${localDirectory}/`,
+                    `${entryPath}.source must be inside ${localDirectory}/`,
                 );
             }
 
@@ -197,10 +192,10 @@ const resolveConfig = async ({
             try {
                 fileStatus = await stat(localPath);
             } catch {
-                throw new Error(`${entryPath}.file does not exist`);
+                throw new Error(`${entryPath}.source does not exist`);
             }
             if (!fileStatus.isFile()) {
-                throw new Error(`${entryPath}.file must point to a file`);
+                throw new Error(`${entryPath}.source must point to a file`);
             }
 
             const encodedPath = pathWithinDirectory
@@ -209,7 +204,7 @@ const resolveConfig = async ({
                 .join('/');
             resolvedUrl = new URL(`${localDirectory}/${encodedPath}`, rawRoot);
         } else {
-            resolvedUrl = requireHttpsUrl(url, `${entryPath}.url`);
+            resolvedUrl = requireHttpsUrl(entrySource, `${entryPath}.source`);
         }
 
         if (

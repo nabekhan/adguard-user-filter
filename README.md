@@ -6,10 +6,10 @@
 ## Filters
 
 - Config: `config/filter.json`
-- Local files: `sources/filters/<website>/<category>/<key>.txt`
+- Local files: `sources/filters/<target>/<category>/<key>.txt`
 - Generated config: `dist/filters/config.json`
 
-Use `global` for multi-site rules. Remote entries use an HTTPS `url`.
+Use `global` for multi-site rules. `source` is a local path or HTTPS URL.
 Optional platforms: `android`, `chromium`, `firefox`, `ios`, `linux`, `mac`,
 `safari`, and `windows`. Omit `platforms` to use all.
 
@@ -29,7 +29,7 @@ Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/
 ## Userscripts
 
 - Config: `config/userscripts.json`
-- Local files: `sources/userscripts/<website>/<category>/<key>.user.js`
+- Local files: `sources/userscripts/<target>/<category>/<key>.user.js`
 - Generated config: `dist/userscripts/config.json`
 
 Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js).
@@ -45,7 +45,7 @@ npm run format
 npm run validate
 ```
 
-`npm run format` normalizes config values, sorts entries by website, category,
+`npm run format` normalizes config values, sorts entries by target, category,
 and key, organizes local files, and removes empty folders. `global` and `other`
 sort last.
 
