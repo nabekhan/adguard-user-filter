@@ -504,7 +504,7 @@
               .map((platform) => platformLabels[platform] ?? platform)
               .join(', '),
       );
-      addDetail('Recommended', script.enabled ? 'Install' : 'Skip');
+      addDetail('Recommendation', script.enabled ? 'Install' : 'Skip');
       installPanel.append(details);
 
       const actions = document.createElement('div');
