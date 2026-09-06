@@ -2,7 +2,7 @@
 
 [Filter config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filter.json)
 
-[Userscripts config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts.json) - Requires: [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js)
+[Userscripts config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts.json) (Requires: [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js))
 
 ## Filters
 
