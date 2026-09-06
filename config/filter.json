@@ -8,6 +8,7 @@
       "category": "other",
       "enabled": true,
       "file": "icloud/other/siri-ai-enable.txt",
+      "platforms": ["ios", "mac"],
       "website": "icloud"
     },
     "norsagir-youtube-hide-shorts": {

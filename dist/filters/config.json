@@ -8,6 +8,10 @@
       "category": "other",
       "enabled": true,
       "website": "icloud",
+      "platforms": [
+        "adguard_app_ios",
+        "adguard_app_mac"
+      ],
       "url": "https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/sources/filters/icloud/other/siri-ai-enable.txt"
     },
     "norsagir-youtube-hide-shorts": {

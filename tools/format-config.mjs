@@ -9,6 +9,7 @@ import {
 } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import slugifyText from '@sindresorhus/slugify';
+import { format as formatWithPrettier } from 'prettier';
 
 import { configDefinitions, websitePattern } from './config-definitions.mjs';
 
@@ -54,6 +55,30 @@ const requireFile = (value, suffix, path) => {
     }
 };
 
+const normalizePlatforms = (value, allowedPlatforms, path) => {
+    if (!Array.isArray(value) || value.length === 0) {
+        throw new Error(`${path} must be a non-empty array`);
+    }
+    if (allowedPlatforms === undefined) {
+        throw new Error(`${path} is not supported by this config`);
+    }
+
+    const platforms = value.map((platform, index) =>
+        normalizeSlug(platform, `${path}.${index}`),
+    );
+    const unknown = platforms.filter(
+        (platform) => !allowedPlatforms.includes(platform),
+    );
+    if (unknown.length > 0) {
+        throw new Error(`${path} has unknown values: ${unknown.join(', ')}`);
+    }
+    if (new Set(platforms).size !== platforms.length) {
+        throw new Error(`${path} cannot contain duplicates`);
+    }
+
+    return platforms.sort(collator.compare);
+};
+
 const resolveWithin = (directory, path, label) => {
     const directoryPath = resolve(root, directory);
     const absolutePath = resolve(directoryPath, path);
@@ -73,7 +98,7 @@ const resolveWithin = (directory, path, label) => {
 const normalizeCollection = (
     entries,
     path,
-    { localDirectory, localFileSuffix },
+    { allowedPlatforms, localDirectory, localFileSuffix },
 ) => {
     const normalized = [];
     const originalsBySlug = new Map();
@@ -99,6 +124,16 @@ const normalizeCollection = (
         const category = normalizeSlug(value.category, `${entryPath}.category`);
         const website = normalizeWebsite(value.website, `${entryPath}.website`);
         let normalizedValue = { ...value, category, website };
+        if (value.platforms !== undefined) {
+            normalizedValue = {
+                ...normalizedValue,
+                platforms: normalizePlatforms(
+                    value.platforms,
+                    allowedPlatforms,
+                    `${entryPath}.platforms`,
+                ),
+            };
+        }
         if (value.file !== undefined) {
             requireFile(value.file, localFileSuffix, `${entryPath}.file`);
             const file = `${website}/${category}/${key}${localFileSuffix}`;
@@ -231,11 +266,14 @@ for (const definition of configDefinitions) {
             slugsByOriginal.get(config.requires) ??
             normalizeSlug(config.requires, `${sourcePath}.requires`);
     }
-    const formatted = `${JSON.stringify(
-        { ...normalizedConfig, [collectionName]: collection },
-        null,
-        2,
-    )}\n`;
+    const formatted = await formatWithPrettier(
+        JSON.stringify(
+            { ...normalizedConfig, [collectionName]: collection },
+            null,
+            2,
+        ),
+        { parser: 'json' },
+    );
 
     if (checking && source !== formatted) {
         formattingIssues.push(sourcePath);

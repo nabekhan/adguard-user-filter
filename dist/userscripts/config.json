@@ -32,6 +32,9 @@
       "category": "tools",
       "enabled": true,
       "website": "youtube",
+      "platforms": [
+        "ios"
+      ],
       "url": "https://update.greasyfork.org/scripts/525416/YouTube%20Safari%20iOS%20PiP%20Block%20Unblocker.user.js"
     },
     "grocery-price-per-unit": {

@@ -38,6 +38,27 @@ const requireHttpsUrl = (value, path) => {
     return url;
 };
 
+const requirePlatforms = (platforms, allowedPlatforms, path) => {
+    if (platforms === undefined) {
+        return;
+    }
+    if (!Array.isArray(platforms) || platforms.length === 0) {
+        throw new Error(`${path} must be a non-empty array`);
+    }
+
+    for (const [index, platform] of platforms.entries()) {
+        requireString(platform, `${path}.${index}`);
+        if (!allowedPlatforms.includes(platform)) {
+            throw new Error(
+                `${path}.${index} has unknown platform: ${platform}`,
+            );
+        }
+    }
+    if (new Set(platforms).size !== platforms.length) {
+        throw new Error(`${path} cannot contain duplicates`);
+    }
+};
+
 const rejectUnknownFields = (value, allowedFields, path) => {
     const unknownFields = Object.keys(value).filter(
         (field) => !allowedFields.has(field),
@@ -62,8 +83,10 @@ const resolveConfig = async ({
     sourcePath,
     outputPath,
     collectionName,
+    allowedPlatforms,
     localDirectory,
     localFileSuffix,
+    platformFlags,
     requiredStringFields,
     optionalStringFields,
 }) => {
@@ -104,6 +127,10 @@ const resolveConfig = async ({
     }
 
     const collection = {};
+    const allowedEntryFields = new Set(entryFields);
+    if (allowedPlatforms !== undefined) {
+        allowedEntryFields.add('platforms');
+    }
     for (const [name, entry] of Object.entries(entries)) {
         const entryPath = `${sourcePath}.${collectionName}.${name}`;
         if (!slugPattern.test(name)) {
@@ -112,7 +139,7 @@ const resolveConfig = async ({
         if (!isObject(entry)) {
             throw new Error(`${entryPath} must be an object`);
         }
-        rejectUnknownFields(entry, entryFields, entryPath);
+        rejectUnknownFields(entry, allowedEntryFields, entryPath);
         requireString(entry.category, `${entryPath}.category`);
         if (!slugPattern.test(entry.category)) {
             throw new Error(
@@ -128,8 +155,13 @@ const resolveConfig = async ({
         if (typeof entry.enabled !== 'boolean') {
             throw new Error(`${entryPath}.enabled must be a boolean`);
         }
+        requirePlatforms(
+            entry.platforms,
+            allowedPlatforms,
+            `${entryPath}.platforms`,
+        );
 
-        const { file, url, ...settings } = entry;
+        const { file, platforms, url, ...settings } = entry;
         if ((file === undefined) === (url === undefined)) {
             throw new Error(
                 `${entryPath} must specify exactly one of file or url`,
@@ -187,7 +219,19 @@ const resolveConfig = async ({
             throw new Error(`${entryPath} must point to a .user.js file`);
         }
 
-        collection[name] = { ...settings, url: resolvedUrl.href };
+        collection[name] = {
+            ...settings,
+            ...(platforms === undefined
+                ? {}
+                : {
+                      platforms: platforms.map((platform) =>
+                          platformFlags === undefined
+                              ? platform
+                              : platformFlags[platform],
+                      ),
+                  }),
+            url: resolvedUrl.href,
+        };
     }
 
     return {

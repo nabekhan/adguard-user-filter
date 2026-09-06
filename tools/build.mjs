@@ -2,6 +2,8 @@ import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { isAbsolute, relative, resolve, sep } from 'node:path';
 import { compile } from '@adguard/filters-compiler';
 
+import { filterPlatformFlags } from './config-definitions.mjs';
+
 const root = resolve(import.meta.dirname, '..');
 const config = JSON.parse(
     await readFile(resolve(root, 'dist', 'filters', 'config.json'), 'utf8'),
@@ -10,11 +12,13 @@ const rawFiltersUrl = new URL(
     'https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/sources/filters/',
 );
 const localFiltersDir = resolve(root, 'sources', 'filters');
+const allowedPlatformFlags = new Set(Object.values(filterPlatformFlags));
 const filterId = 100001;
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)
     .map(([name, value]) => ({
         name,
+        platforms: value.platforms,
         url: value.url,
     }));
 
@@ -24,7 +28,7 @@ for (const field of ['title', 'description', 'homepage', 'expires']) {
     }
 }
 
-for (const { name, url } of enabled) {
+for (const { name, platforms, url } of enabled) {
     if (!/^[a-z0-9][a-z0-9-]*$/i.test(name)) {
         throw new Error(`Invalid list name: ${name}`);
     }
@@ -42,6 +46,18 @@ for (const { name, url } of enabled) {
 
     if (parsedUrl.protocol !== 'https:') {
         throw new Error(`List URL for ${name} must use HTTPS`);
+    }
+
+    if (platforms !== undefined) {
+        if (!Array.isArray(platforms) || platforms.length === 0) {
+            throw new Error(`Platforms for ${name} must be a non-empty array`);
+        }
+        if (
+            new Set(platforms).size !== platforms.length ||
+            platforms.some((platform) => !allowedPlatformFlags.has(platform))
+        ) {
+            throw new Error(`Invalid platforms for ${name}`);
+        }
     }
 }
 
@@ -78,20 +94,29 @@ const localFilterPath = (url) => {
     return localPath;
 };
 const template = [
-    ...enabled.map(({ url }) => {
+    ...enabled.map(({ platforms, url }) => {
         const normalizedUrl = new URL(url).href;
         const localPath = localFilterPath(normalizedUrl);
+        let include;
         if (localPath === undefined) {
-            return `@include ${JSON.stringify(normalizedUrl)} /stripComments`;
+            include = `@include ${JSON.stringify(normalizedUrl)} /stripComments`;
+        } else {
+            const relativePath = relative(
+                resolve(sourceDir, 'user-filter'),
+                localPath,
+            )
+                .split(sep)
+                .join('/');
+            include = `@include ${JSON.stringify(relativePath)} /stripComments /ignoreTrustLevel`;
         }
 
-        const relativePath = relative(
-            resolve(sourceDir, 'user-filter'),
-            localPath,
-        )
-            .split(sep)
-            .join('/');
-        return `@include ${JSON.stringify(relativePath)} /stripComments /ignoreTrustLevel`;
+        if (platforms === undefined) {
+            return include;
+        }
+
+        return [`!#if (${platforms.join(' || ')})`, include, '!#endif'].join(
+            '\n',
+        );
     }),
     '',
 ].join('\n');
