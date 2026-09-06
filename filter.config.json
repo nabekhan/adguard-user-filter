@@ -7,6 +7,9 @@
     "norsagir-youtube-hide-shorts": {
       "enabled": true,
       "url": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
+    },
+    "youtube-shorts-extras": {
+      "enabled": true
     }
   }
 }
