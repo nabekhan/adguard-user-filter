@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Userscript Installer
 // @namespace    https://github.com/nabekhan/filters-userscripts
-// @version      0.9.5
+// @version      0.9.8
 // @description  Opens userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/filters-userscripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js
@@ -15,7 +15,7 @@
 // @grant        GM_registerMenuCommand
 // @grant        GM_xmlhttpRequest
 // @connect      *
-// @run-at       document-idle
+// @run-at       document-end
 // @noframes
 // ==/UserScript==
 
@@ -278,32 +278,91 @@
       .filter(({ key, url }) => key !== config.requires && !ownUrls.has(url));
   };
 
-  let downloadUrl;
-  let index = 0;
-  let panel;
+  const installerId = 'userscript-installer';
+  const itemId = (index) => `${installerId}-item-${index + 1}`;
 
-  const revokeDownload = () => {
-    if (downloadUrl !== undefined) {
-      URL.revokeObjectURL(downloadUrl);
-      downloadUrl = undefined;
+  const actionStyles = (primary) =>
+    [
+      'display: block',
+      'box-sizing: border-box',
+      'padding: 5px 10px',
+      `border: 1px solid ${primary ? '#0969da' : '#8c959f'}`,
+      'border-radius: 6px',
+      `background: ${primary ? '#0969da' : 'Canvas'}`,
+      `color: ${primary ? 'white' : 'CanvasText'}`,
+      'font: 600 13px/1.2 system-ui, sans-serif',
+      'text-align: center',
+      'text-decoration: none',
+      'cursor: pointer',
+    ].join(';');
+
+  const addDetail = (details, label, value) => {
+    const term = document.createElement('dt');
+    term.textContent = label;
+    term.style.fontWeight = '600';
+    const description = document.createElement('dd');
+    description.textContent = value;
+    description.style.cssText = 'margin: 0; overflow-wrap: anywhere';
+    details.append(term, description);
+  };
+
+  const createNavigation = (label, title, destination) => {
+    const control = document.createElement(destination ? 'a' : 'span');
+    control.textContent = label;
+    control.title = title;
+    control.setAttribute('aria-label', title);
+    control.style.cssText = actionStyles(false);
+    if (destination === undefined) {
+      control.setAttribute('aria-disabled', 'true');
+      control.style.opacity = '0.35';
+    } else {
+      control.href = `#${destination}`;
     }
+    return control;
   };
 
-  const closePanel = () => {
-    revokeDownload();
-    panel?.remove();
-    panel = undefined;
-  };
-
-  const createPanel = () => {
-    closePanel();
-    panel = document.createElement('div');
-    panel.setAttribute('role', 'dialog');
-    panel.style.cssText = [
+  const createInstaller = (scripts) => {
+    const root = document.createElement('details');
+    root.id = installerId;
+    root.style.cssText = [
       'position: fixed',
       'right: 8px',
-      'bottom: 44px',
+      'bottom: 8px',
       'z-index: 2147483647',
+      'color: CanvasText',
+      'font: 13px/1.4 system-ui, sans-serif',
+    ].join(';');
+
+    const summary = document.createElement('summary');
+    summary.textContent = 'Install';
+    summary.title = 'Install userscripts from this page';
+    summary.setAttribute('aria-label', summary.title);
+    summary.style.cssText = [
+      'display: flex',
+      'align-items: center',
+      'height: 32px',
+      'padding: 0 12px',
+      'border: 1px solid #0969da',
+      'border-radius: 16px',
+      'background: #0969da',
+      'color: white',
+      'font: 700 13px/1 system-ui, sans-serif',
+      'opacity: 0.8',
+      'touch-action: manipulation',
+      '-webkit-tap-highlight-color: transparent',
+      'cursor: pointer',
+      'box-shadow: 0 1px 3px rgb(0 0 0 / 25%)',
+      'list-style: none',
+    ].join(';');
+    root.append(summary);
+
+    const panel = document.createElement('div');
+    panel.setAttribute('role', 'dialog');
+    panel.setAttribute('aria-label', 'Install userscripts');
+    panel.style.cssText = [
+      'position: absolute',
+      'right: 0',
+      'bottom: 40px',
       'box-sizing: border-box',
       'width: min(300px, calc(100vw - 16px))',
       'max-height: min(400px, calc(100vh - 60px))',
@@ -316,168 +375,85 @@
       'font: 13px/1.4 system-ui, sans-serif',
       'box-shadow: 0 4px 16px rgb(0 0 0 / 25%)',
     ].join(';');
-    document.body.append(panel);
-    return panel;
-  };
 
-  const createAction = (label, primary, action) => {
-    const actionButton = document.createElement('button');
-    actionButton.type = 'button';
-    actionButton.textContent = label;
-    actionButton.style.cssText = [
-      'padding: 5px 10px',
-      `border: 1px solid ${primary ? '#0969da' : '#8c959f'}`,
-      'border-radius: 6px',
-      `background: ${primary ? '#0969da' : 'Canvas'}`,
-      `color: ${primary ? 'white' : 'CanvasText'}`,
-      'font: 600 13px/1.2 system-ui, sans-serif',
-      'cursor: pointer',
-    ].join(';');
-    actionButton.addEventListener('click', action);
-    return actionButton;
-  };
+    if (scripts.length === 0) {
+      panel.textContent = 'No userscripts.';
+      root.append(panel);
+      return root;
+    }
 
-  const createDownloadControl = (archive) => {
-    downloadUrl = URL.createObjectURL(archive);
-    const control = document.createElement('div');
-    control.style.position = 'relative';
-    const saveLink = document.createElement('a');
-    saveLink.href = downloadUrl;
-    saveLink.download = 'userscripts.zip';
-    saveLink.textContent = 'Save ZIP';
-    saveLink.title =
-      'If clicking does not download, right-click and choose Save Link As.';
-    saveLink.style.cssText = [
-      'padding: 5px 10px',
-      'border: 1px solid #0969da',
-      'border-radius: 6px',
-      'background: #0969da',
-      'color: white',
-      'font: 600 13px/1.2 system-ui, sans-serif',
-      'text-decoration: none',
-      'cursor: pointer',
-    ].join(';');
-
-    const hint = document.createElement('div');
-    hint.hidden = true;
-    hint.textContent =
-      'If it does not download, right-click Save ZIP and choose Save Link As.';
-    hint.style.cssText = [
-      'position: absolute',
-      'top: calc(100% + 6px)',
-      'right: 0',
-      'z-index: 1',
-      'width: 190px',
-      'padding: 6px 8px',
-      'border: 1px solid #8c959f',
-      'border-radius: 6px',
-      'background: Canvas',
-      'color: CanvasText',
-      'font: 12px/1.3 system-ui, sans-serif',
-      'box-shadow: 0 2px 8px rgb(0 0 0 / 25%)',
-    ].join(';');
-    saveLink.addEventListener('click', () => {
-      hint.hidden = false;
-    });
-    control.append(saveLink, hint);
-    return control;
-  };
-
-  const showMessage = (message) => {
-    const messagePanel = createPanel();
-    const text = document.createElement('div');
-    text.textContent = message;
-    messagePanel.append(text);
-
-    const actions = document.createElement('div');
-    actions.style.cssText =
-      'display: flex; justify-content: flex-end; margin-top: 10px';
-    actions.append(createAction('Close', false, closePanel));
-    messagePanel.append(actions);
-  };
-
-  const showInstallPanel = (scripts) => {
-    const installPanel = createPanel();
-    installPanel.setAttribute('aria-label', 'Install userscripts');
-    index = Math.min(index, scripts.length - 1);
-
-    const render = () => {
-      revokeDownload();
-      const script = scripts[index];
-      installPanel.replaceChildren();
-
-      const header = document.createElement('div');
-      header.style.cssText =
-        'display: flex; align-items: center; justify-content: space-between; gap: 8px';
-      const heading = document.createElement('div');
-      const headingTitle = document.createElement('div');
-      headingTitle.textContent = 'Installer';
-      headingTitle.style.fontWeight = '700';
+    const header = document.createElement('div');
+    header.style.cssText =
+      'display: flex; align-items: center; justify-content: space-between; gap: 8px';
+    const heading = document.createElement('div');
+    const headingTitle = document.createElement('div');
+    headingTitle.textContent = 'Installer';
+    headingTitle.style.fontWeight = '700';
+    heading.append(headingTitle);
+    for (let index = 0; index < scripts.length; index += 1) {
       const position = document.createElement('div');
+      position.className = 'userscript-installer-position';
+      position.dataset.index = String(index);
       position.textContent = `${index + 1} of ${scripts.length}`;
-      position.style.cssText = 'color: GrayText; font-size: 12px';
-      heading.append(headingTitle, position);
+      position.style.cssText =
+        'display: none; color: GrayText; font-size: 12px';
+      heading.append(position);
+    }
 
-      const downloadArea = document.createElement('div');
-      const downloadButton = createAction('Download all', false, async () => {
-        downloadButton.disabled = true;
-        downloadButton.textContent = 'Downloading…';
-        try {
-          const archive = await downloadScripts(scripts);
-          if (panel === installPanel) {
-            downloadArea.replaceChildren(createDownloadControl(archive));
-          }
-        } catch (error) {
-          if (panel === installPanel) {
-            showMessage(`Could not download userscripts: ${error.message}`);
-          }
-        }
-      });
-      downloadArea.append(downloadButton);
-      header.append(heading, downloadArea);
-      installPanel.append(header);
+    const downloadLink = document.createElement('a');
+    downloadLink.textContent = 'Download all';
+    downloadLink.title = 'Preparing ZIP…';
+    downloadLink.setAttribute('aria-disabled', 'true');
+    downloadLink.style.cssText = `${actionStyles(false)}; opacity: 0.5; pointer-events: none`;
+    header.append(heading, downloadLink);
+    panel.append(header);
 
-      const progress = document.createElement('div');
-      progress.style.cssText =
-        'display: flex; gap: 4px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #8c959f';
-      for (let item = 0; item < scripts.length; item += 1) {
-        const marker = document.createElement('button');
-        marker.type = 'button';
-        marker.title = `Go to ${scripts[item].key}`;
-        marker.setAttribute('aria-label', marker.title);
-        marker.style.cssText = [
-          'height: 13px',
-          'flex: 1',
-          'padding: 5px 0',
-          'border: 0',
-          'background: transparent',
-          'appearance: none',
-          'cursor: pointer',
-        ].join(';');
-        const dash = document.createElement('span');
-        dash.style.cssText = [
-          'display: block',
-          'width: 100%',
-          'height: 3px',
-          'border-radius: 2px',
-          `background: ${item === index ? 'CanvasText' : '#8c959f'}`,
-          `opacity: ${item === index ? '1' : '0.45'}`,
-          'pointer-events: none',
-        ].join(';');
-        marker.append(dash);
-        marker.addEventListener('click', () => {
-          index = item;
-          render();
-        });
-        progress.append(marker);
-      }
-      installPanel.append(progress);
+    const progress = document.createElement('div');
+    progress.style.cssText =
+      'display: flex; gap: 4px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #8c959f';
+    for (let index = 0; index < scripts.length; index += 1) {
+      const marker = document.createElement('a');
+      marker.className = 'userscript-installer-marker';
+      marker.dataset.index = String(index);
+      marker.href = `#${itemId(index)}`;
+      marker.title = `Go to ${scripts[index].key}`;
+      marker.setAttribute('aria-label', marker.title);
+      marker.style.cssText = [
+        'height: 13px',
+        'flex: 1',
+        'padding: 5px 0',
+        'border: 0',
+        'background: transparent',
+        'cursor: pointer',
+      ].join(';');
+      const dash = document.createElement('span');
+      dash.style.cssText = [
+        'display: block',
+        'width: 100%',
+        'height: 3px',
+        'border-radius: 2px',
+        'background: #8c959f',
+        'opacity: 0.45',
+        'pointer-events: none',
+      ].join(';');
+      marker.append(dash);
+      progress.append(marker);
+    }
+    panel.append(progress);
+
+    for (let index = 0; index < scripts.length; index += 1) {
+      const script = scripts[index];
+      const card = document.createElement('section');
+      card.id = itemId(index);
+      card.className = 'userscript-installer-card';
+      card.dataset.index = String(index);
+      card.style.display = 'none';
 
       const title = document.createElement('div');
       title.textContent = script.key;
       title.style.cssText =
         'margin-top: 2px; font-size: 14px; font-weight: 700; overflow-wrap: anywhere';
-      installPanel.append(title);
+      card.append(title);
 
       const details = document.createElement('dl');
       details.style.cssText = [
@@ -486,18 +462,10 @@
         'gap: 4px 10px',
         'margin: 10px 0 0',
       ].join(';');
-      const addDetail = (label, value) => {
-        const term = document.createElement('dt');
-        term.textContent = label;
-        term.style.fontWeight = '600';
-        const description = document.createElement('dd');
-        description.textContent = value;
-        description.style.cssText = 'margin: 0; overflow-wrap: anywhere';
-        details.append(term, description);
-      };
-      addDetail('Category', script.category);
-      addDetail('Target', script.target);
+      addDetail(details, 'Category', script.category);
+      addDetail(details, 'Target', script.target);
       addDetail(
+        details,
         'Platforms',
         script.platforms.length === 0
           ? 'All'
@@ -505,66 +473,89 @@
               .map((platform) => platformLabels[platform] ?? platform)
               .join(', '),
       );
-      addDetail('Recommendation', script.enabled ? 'Install' : 'Skip');
-      installPanel.append(details);
+      addDetail(details, 'Recommendation', script.enabled ? 'Install' : 'Skip');
+      card.append(details);
 
       const actions = document.createElement('div');
       actions.style.cssText =
         'display: grid; grid-template-columns: auto 1fr auto; gap: 8px; margin-top: 12px';
-      const previous = createAction('‹', false, () => {
-        index -= 1;
-        render();
-      });
-      previous.disabled = index === 0;
-      previous.title = 'Previous';
-      previous.setAttribute('aria-label', previous.title);
-      previous.style.opacity = previous.disabled ? '0.35' : '1';
+      const previous = createNavigation(
+        '‹',
+        'Previous',
+        index === 0 ? undefined : itemId(index - 1),
+      );
 
-      const installButton = createAction('Install', true, () => {
+      const installLink = document.createElement('a');
+      installLink.href = script.url;
+      installLink.textContent = 'Install';
+      installLink.style.cssText = actionStyles(true);
+      installLink.addEventListener('click', (event) => {
+        event.preventDefault();
         openInTab(script.url);
       });
 
-      const next = createAction('›', false, () => {
-        index += 1;
-        render();
+      const next = createNavigation(
+        '›',
+        'Next',
+        index === scripts.length - 1 ? undefined : itemId(index + 1),
+      );
+      actions.append(previous, installLink, next);
+      card.append(actions);
+      panel.append(card);
+    }
+
+    const selectors = [];
+    for (let index = 0; index < scripts.length; index += 1) {
+      const target = `#${itemId(index)}:target`;
+      selectors.push(
+        `#${installerId}:has(${target}) .userscript-installer-position[data-index="${index}"] { display: block !important; }`,
+        `#${installerId}:has(${target}) .userscript-installer-marker[data-index="${index}"] span { background: CanvasText !important; opacity: 1 !important; }`,
+      );
+    }
+    const style = document.createElement('style');
+    style.textContent = `
+      #${installerId} > summary::-webkit-details-marker { display: none; }
+      #${installerId}:not(:has(.userscript-installer-card:target)) .userscript-installer-position[data-index="0"] { display: block !important; }
+      #${installerId}:not(:has(.userscript-installer-card:target)) .userscript-installer-marker[data-index="0"] span { background: CanvasText !important; opacity: 1 !important; }
+      #${installerId}:not(:has(.userscript-installer-card:target)) .userscript-installer-card[data-index="0"],
+      #${installerId} .userscript-installer-card:target { display: block !important; }
+      ${selectors.join('\n')}
+    `;
+    root.append(panel, style);
+
+    downloadScripts(scripts)
+      .then((archive) => {
+        downloadLink.href = URL.createObjectURL(archive);
+        downloadLink.download = 'userscripts.zip';
+        downloadLink.title = 'Save ZIP';
+        downloadLink.removeAttribute('aria-disabled');
+        downloadLink.style.opacity = '1';
+        downloadLink.style.pointerEvents = 'auto';
+      })
+      .catch((error) => {
+        downloadLink.textContent = 'Download unavailable';
+        downloadLink.title = error.message;
       });
-      next.disabled = index === scripts.length - 1;
-      next.title = 'Next';
-      next.setAttribute('aria-label', next.title);
-      next.style.opacity = next.disabled ? '0.35' : '1';
 
-      actions.append(previous, installButton, next);
-      installPanel.append(actions);
-    };
-
-    render();
+    return root;
   };
 
-  const install = (getConfig) => {
-    try {
-      const scripts = loadScripts(getConfig());
-      if (scripts.length === 0) {
-        showMessage('No userscripts.');
-        return;
-      }
-      showInstallPanel(scripts);
-    } catch (error) {
-      showMessage(`Could not load userscripts: ${error.message}`);
-    }
-  };
+  const existingInstaller = document.getElementById(installerId);
+  if (existingInstaller !== null) {
+    existingInstaller.open = location.hash.startsWith(`#${installerId}-item-`);
+    return;
+  }
 
-  const configFromCurrentPage = () =>
-    parseConfig(document.body?.textContent ?? '');
+  let scripts;
+  try {
+    scripts = loadScripts(parseConfig(document.body?.textContent ?? ''));
+  } catch {
+    return;
+  }
 
-  const toggleInstaller = (getConfig) => {
-    if (panel !== undefined) {
-      closePanel();
-      return;
-    }
-    install(getConfig);
-  };
-
-  const installFromCurrentPage = () => toggleInstaller(configFromCurrentPage);
+  const installer = createInstaller(scripts);
+  installer.open = location.hash.startsWith(`#${installerId}-item-`);
+  document.body.append(installer);
 
   const modernApi = typeof GM === 'object' ? GM : undefined;
   const registerMenuCommand =
@@ -573,58 +564,7 @@
       : typeof GM_registerMenuCommand === 'function'
         ? GM_registerMenuCommand
         : undefined;
-
-  if (registerMenuCommand !== undefined) {
-    registerMenuCommand(
-      'Install userscripts from this page',
-      installFromCurrentPage,
-    );
-  }
-
-  let currentPageConfig;
-  try {
-    currentPageConfig = configFromCurrentPage();
-  } catch {
-    currentPageConfig = undefined;
-  }
-
-  if (currentPageConfig === undefined) {
-    return;
-  }
-
-  const button = document.createElement('button');
-  button.type = 'button';
-  button.textContent = 'Install';
-  button.title = 'Install userscripts from this page';
-  button.setAttribute('aria-label', button.title);
-  button.style.cssText = [
-    'position: fixed',
-    'right: 8px',
-    'bottom: 8px',
-    'z-index: 2147483647',
-    'height: 32px',
-    'padding: 0 12px',
-    'border: 1px solid #0969da',
-    'border-radius: 16px',
-    'background: #0969da',
-    'color: white',
-    'font: 700 13px/1 system-ui, sans-serif',
-    'opacity: 0.8',
-    'touch-action: manipulation',
-    '-webkit-tap-highlight-color: transparent',
-    'cursor: pointer',
-    'box-shadow: 0 1px 3px rgb(0 0 0 / 25%)',
-  ].join(';');
-  const toggleCurrentPage = () => toggleInstaller(() => currentPageConfig);
-  button.addEventListener('click', toggleCurrentPage);
-  button.addEventListener(
-    'touchend',
-    (event) => {
-      event.preventDefault();
-      toggleCurrentPage();
-    },
-    { passive: false },
-  );
-
-  document.body.append(button);
+  registerMenuCommand?.('Install userscripts from this page', () => {
+    installer.open = !installer.open;
+  });
 })();
