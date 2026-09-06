@@ -26,7 +26,7 @@
       "category": "nuisances",
       "enabled": true,
       "target": "youtube",
-      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts/youtube/nuisances/sb-js-userscript.user.js"
+      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts/sb-js-userscript.user.js"
     },
     "youtube-safari-pip": {
       "category": "tools",
