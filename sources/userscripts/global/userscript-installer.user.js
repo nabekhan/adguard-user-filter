@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Userscript Installer
 // @namespace    https://github.com/nabekhan/filters-userscripts
-// @version      0.7.0
+// @version      0.7.1
 // @description  Opens userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/filters-userscripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js
@@ -200,15 +200,7 @@
         contents: await fetchText(script.url, script.key),
       })),
     );
-    const url = URL.createObjectURL(createZip(files));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'userscripts.zip';
-    link.style.display = 'none';
-    document.body.append(link);
-    link.click();
-    link.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    return createZip(files);
   };
 
   const resolveSource = (key, entry) => {
@@ -276,9 +268,18 @@
       .filter(({ key, url }) => key !== config.requires && !ownUrls.has(url));
   };
 
+  let downloadUrl;
   let panel;
 
+  const revokeDownload = () => {
+    if (downloadUrl !== undefined) {
+      URL.revokeObjectURL(downloadUrl);
+      downloadUrl = undefined;
+    }
+  };
+
   const closePanel = () => {
+    revokeDownload();
     panel?.remove();
     panel = undefined;
   };
@@ -323,6 +324,44 @@
     ].join(';');
     actionButton.addEventListener('click', action);
     return actionButton;
+  };
+
+  const showDownload = (archive) => {
+    const downloadPanel = createPanel();
+    downloadPanel.setAttribute('aria-label', 'Download userscripts');
+
+    const text = document.createElement('div');
+    text.textContent = 'userscripts.zip is ready.';
+    downloadPanel.append(text);
+
+    const actions = document.createElement('div');
+    actions.style.cssText =
+      'display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px';
+
+    downloadUrl = URL.createObjectURL(archive);
+    const saveLink = document.createElement('a');
+    saveLink.href = downloadUrl;
+    saveLink.download = 'userscripts.zip';
+    saveLink.textContent = 'Save ZIP';
+    saveLink.style.cssText = [
+      'padding: 5px 10px',
+      'border: 1px solid #0969da',
+      'border-radius: 6px',
+      'background: #0969da',
+      'color: white',
+      'font: 600 13px/1.2 system-ui, sans-serif',
+      'text-decoration: none',
+      'cursor: pointer',
+    ].join(';');
+    saveLink.addEventListener('click', () => {
+      const savedUrl = downloadUrl;
+      downloadUrl = undefined;
+      closePanel();
+      setTimeout(() => URL.revokeObjectURL(savedUrl), 60_000);
+    });
+
+    actions.append(createAction('Close', false, closePanel), saveLink);
+    downloadPanel.append(actions);
   };
 
   const showMessage = (message) => {
@@ -416,8 +455,7 @@
         downloadButton.disabled = true;
         downloadButton.textContent = 'Downloading…';
         try {
-          await downloadScripts(scripts);
-          showMessage('Downloaded userscripts.zip.');
+          showDownload(await downloadScripts(scripts));
         } catch (error) {
           showMessage(`Could not download userscripts: ${error.message}`);
         }

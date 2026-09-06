@@ -39,7 +39,8 @@ Patch replacements use `{ from, to }`. `from` can be text or a regular expressio
 
 Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js).
 Open a raw userscript config page, click the bottom-right button, then install or
-skip each script. `Download all` saves the scripts as `userscripts.zip`.
+skip each script. `Download all` prepares `userscripts.zip`; click `Save ZIP` to
+save it.
 
 ## Development
 
