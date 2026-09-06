@@ -1,0 +1,9 @@
+{
+  "replacements": [
+    {
+      "pattern": "^// @match\\s+https://www\\.youtube\\.com/watch\\*$",
+      "flags": "m",
+      "replacement": "// @match        https://*.youtube.com/*"
+    }
+  ]
+}

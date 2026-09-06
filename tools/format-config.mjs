@@ -5,6 +5,7 @@ import {
     rename,
     rmdir,
     stat,
+    unlink,
     writeFile,
 } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
@@ -12,6 +13,10 @@ import slugifyText from '@sindresorhus/slugify';
 import { format as formatWithPrettier } from 'prettier';
 
 import { configDefinitions, targetPattern } from './config-definitions.mjs';
+import {
+    emptyRemotePatch,
+    remotePatchRelativePath,
+} from './remote-patches.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const collator = new Intl.Collator('en', {
@@ -119,6 +124,7 @@ const normalizeCollection = (
     const originalsBySlug = new Map();
     const slugsByOriginal = new Map();
     const moves = [];
+    const remotePatches = [];
 
     for (const [name, value] of Object.entries(entries)) {
         const key = normalizeSlug(name, `${path} entry name`);
@@ -178,6 +184,15 @@ const normalizeCollection = (
                     label: `${entryPath}.source`,
                 });
             }
+        } else {
+            remotePatches.push({
+                path: resolveWithin(
+                    localDirectory,
+                    remotePatchRelativePath(target, category, key),
+                    `${entryPath} patch`,
+                ),
+                label: `${localDirectory}/${remotePatchRelativePath(target, category, key)}`,
+            });
         }
         const normalizedValue = {
             category,
@@ -207,6 +222,7 @@ const normalizeCollection = (
     return {
         collection: Object.fromEntries(normalized),
         moves,
+        remotePatches,
         slugsByOriginal,
     };
 };
@@ -277,8 +293,22 @@ const pruneEmptyDirectories = async (directory, keep = directory) => {
     }
 };
 
+const findRemotePatches = async (directory) => {
+    const patches = [];
+    for (const entry of await readdir(directory, { withFileTypes: true })) {
+        const path = resolve(directory, entry.name);
+        if (entry.isDirectory()) {
+            patches.push(...(await findRemotePatches(path)));
+        } else if (entry.isFile() && entry.name.endsWith('.patch.json')) {
+            patches.push(path);
+        }
+    }
+    return patches;
+};
+
 const checking = process.argv.includes('--check');
 const formattingIssues = [];
+const missingRemotePatches = [];
 const plans = [];
 
 for (const definition of configDefinitions) {
@@ -286,11 +316,12 @@ for (const definition of configDefinitions) {
     const configPath = resolve(root, sourcePath);
     const source = await readFile(configPath, 'utf8');
     const config = JSON.parse(source);
-    const { collection, moves, slugsByOriginal } = normalizeCollection(
-        config[collectionName] ?? {},
-        `${sourcePath}.${collectionName}`,
-        definition,
-    );
+    const { collection, moves, remotePatches, slugsByOriginal } =
+        normalizeCollection(
+            config[collectionName] ?? {},
+            `${sourcePath}.${collectionName}`,
+            definition,
+        );
     const normalizedConfig = { ...config };
     if (typeof config.requires === 'string') {
         normalizedConfig.requires =
@@ -309,19 +340,58 @@ for (const definition of configDefinitions) {
     if (checking && source !== formatted) {
         formattingIssues.push(sourcePath);
     }
-    plans.push({ configPath, formatted, moves });
+    for (const remotePatch of remotePatches) {
+        const status = await fileStatus(remotePatch.path);
+        if (status === undefined) {
+            missingRemotePatches.push(remotePatch);
+        } else if (!status.isFile()) {
+            throw new Error(`${remotePatch.label} must be a file`);
+        }
+    }
+    plans.push({ configPath, formatted, moves, remotePatches });
 }
+
+const expectedRemotePatches = new Set(
+    plans.flatMap(({ remotePatches }) => remotePatches.map(({ path }) => path)),
+);
+const existingRemotePatches = (
+    await Promise.all(
+        configDefinitions.map(({ localDirectory }) =>
+            findRemotePatches(resolve(root, localDirectory)),
+        ),
+    )
+).flat();
+const obsoleteRemotePatches = existingRemotePatches.filter(
+    (path) => !expectedRemotePatches.has(path),
+);
 
 if (formattingIssues.length > 0) {
     throw new Error(
         `${formattingIssues.join(', ')} must be formatted; run npm run format`,
     );
 }
+if (checking && missingRemotePatches.length > 0) {
+    throw new Error(
+        `${missingRemotePatches.map(({ label }) => label).join(', ')} missing; run npm run format`,
+    );
+}
+if (checking && obsoleteRemotePatches.length > 0) {
+    throw new Error(
+        `${obsoleteRemotePatches.map((path) => relative(root, path)).join(', ')} obsolete; run npm run format`,
+    );
+}
 
 if (!checking) {
     await applyMoves(plans.flatMap(({ moves }) => moves));
+    for (const { path } of missingRemotePatches) {
+        await mkdir(dirname(path), { recursive: true });
+        await writeFile(path, `${JSON.stringify(emptyRemotePatch, null, 2)}\n`);
+    }
     for (const { configPath, formatted } of plans) {
         await writeFile(configPath, formatted);
+    }
+    for (const path of obsoleteRemotePatches) {
+        await unlink(path);
     }
     for (const { localDirectory } of configDefinitions) {
         await pruneEmptyDirectories(resolve(root, localDirectory));

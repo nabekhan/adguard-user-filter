@@ -1,8 +1,18 @@
 import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
-import { isAbsolute, relative, resolve, sep } from 'node:path';
+import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { compile } from '@adguard/filters-compiler';
 
-import { filterPlatformFlags } from './config-definitions.mjs';
+import {
+    filterPlatformFlags,
+    slugPattern,
+    targetPattern,
+} from './config-definitions.mjs';
+import {
+    applyRemotePatch,
+    fetchRemoteText,
+    readRemotePatch,
+    remotePatchRelativePath,
+} from './remote-patches.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const config = JSON.parse(
@@ -17,8 +27,10 @@ const filterId = 100001;
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)
     .map(([name, value]) => ({
+        category: value.category,
         name,
         platforms: value.platforms,
+        target: value.target,
         url: value.url,
     }));
 
@@ -28,13 +40,16 @@ for (const field of ['title', 'description', 'homepage', 'expires']) {
     }
 }
 
-for (const { name, platforms, url } of enabled) {
+for (const { category, name, platforms, target, url } of enabled) {
     if (!/^[a-z0-9][a-z0-9-]*$/i.test(name)) {
         throw new Error(`Invalid list name: ${name}`);
     }
 
     if (typeof url !== 'string' || url.trim() === '') {
         throw new Error(`Invalid list URL for ${name}`);
+    }
+    if (!slugPattern.test(category) || !targetPattern.test(target)) {
+        throw new Error(`Invalid list path for ${name}`);
     }
 
     let parsedUrl;
@@ -64,6 +79,7 @@ for (const { name, platforms, url } of enabled) {
 const buildDir = resolve(root, '.build');
 const sourceDir = resolve(buildDir, 'filters');
 const platformsDir = resolve(buildDir, 'platforms');
+const remoteFiltersDir = resolve(buildDir, 'remote-filters');
 const distFiltersDir = resolve(root, 'dist', 'filters');
 const localFilterPath = (url) => {
     const source = new URL(url);
@@ -93,38 +109,67 @@ const localFilterPath = (url) => {
 
     return localPath;
 };
-const template = [
-    ...enabled.map(({ platforms, url }) => {
-        const normalizedUrl = new URL(url).href;
-        const localPath = localFilterPath(normalizedUrl);
-        let include;
-        if (localPath === undefined) {
-            include = `@include ${JSON.stringify(normalizedUrl)} /stripComments`;
-        } else {
-            const relativePath = relative(
-                resolve(sourceDir, 'user-filter'),
-                localPath,
-            )
-                .split(sep)
-                .join('/');
-            include = `@include ${JSON.stringify(relativePath)} /stripComments /ignoreTrustLevel`;
-        }
-
-        if (platforms === undefined) {
-            return include;
-        }
-
-        return [`!#if (${platforms.join(' || ')})`, include, '!#endif'].join(
-            '\n',
-        );
-    }),
-    '',
-].join('\n');
-
 const writeJson = (path, value) =>
     writeFile(path, `${JSON.stringify(value, null, 2)}\n`);
 
 await rm(buildDir, { recursive: true, force: true });
+const includes = [];
+for (const { category, name, platforms, target, url } of enabled) {
+    const normalizedUrl = new URL(url).href;
+    let localPath = localFilterPath(normalizedUrl);
+    if (localPath === undefined) {
+        const patchRelativePath = remotePatchRelativePath(
+            target,
+            category,
+            name,
+        );
+        const patchLabel = `sources/filters/${patchRelativePath}`;
+        const patch = await readRemotePatch(
+            resolve(localFiltersDir, patchRelativePath),
+            patchLabel,
+        );
+        if (patch.replacements.length > 0) {
+            const contents = await fetchRemoteText(
+                normalizedUrl,
+                `Remote filter ${name}`,
+            );
+            localPath = resolve(
+                remoteFiltersDir,
+                target,
+                category,
+                `${name}.txt`,
+            );
+            await mkdir(dirname(localPath), { recursive: true });
+            await writeFile(
+                localPath,
+                applyRemotePatch(contents, patch, patchLabel),
+            );
+        }
+    }
+
+    let include;
+    if (localPath === undefined) {
+        include = `@include ${JSON.stringify(normalizedUrl)} /stripComments`;
+    } else {
+        const relativePath = relative(
+            resolve(sourceDir, 'user-filter'),
+            localPath,
+        )
+            .split(sep)
+            .join('/');
+        include = `@include ${JSON.stringify(relativePath)} /stripComments /ignoreTrustLevel`;
+    }
+
+    includes.push(
+        platforms === undefined
+            ? include
+            : [`!#if (${platforms.join(' || ')})`, include, '!#endif'].join(
+                  '\n',
+              ),
+    );
+}
+const template = [...includes, ''].join('\n');
+
 await mkdir(resolve(sourceDir, 'user-filter'), { recursive: true });
 await writeFile(resolve(sourceDir, 'user-filter', 'template.txt'), template);
 await writeFile(resolve(sourceDir, 'user-filter', 'exclude.txt'), '');

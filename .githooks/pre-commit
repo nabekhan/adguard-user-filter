@@ -4,9 +4,12 @@ set -eu
 
 before_format=$(mktemp -t filters-userscripts-before.XXXXXX)
 after_format=$(mktemp -t filters-userscripts-after.XXXXXX)
-trap 'rm -f "$before_format" "$after_format"' EXIT HUP INT TERM
+before_status=$(mktemp -t filters-userscripts-status-before.XXXXXX)
+after_status=$(mktemp -t filters-userscripts-status-after.XXXXXX)
+trap 'rm -f "$before_format" "$after_format" "$before_status" "$after_status"' EXIT HUP INT TERM
 
 git diff --binary >"$before_format"
+git status --porcelain=v1 --untracked-files=all >"$before_status"
 
 if command -v npm >/dev/null 2>&1; then
     npm run format
@@ -27,7 +30,8 @@ else
 fi
 
 git diff --binary >"$after_format"
-if ! cmp -s "$before_format" "$after_format"; then
+git status --porcelain=v1 --untracked-files=all >"$after_status"
+if ! cmp -s "$before_format" "$after_format" || ! cmp -s "$before_status" "$after_status"; then
     echo "pre-commit: the formatter changed files; review and stage them, then commit again" >&2
     exit 1
 fi

@@ -7,6 +7,7 @@
 
 - Config: `sources/filter.json`
 - Local files: `sources/filters/<target>/<category>/<key>.txt`
+- Remote patches: `sources/filters/<target>/<category>/<key>.patch.json`
 - Generated config: `dist/filter.json`
 
 Use `global` for multi-site rules. `source` is a local path or HTTPS URL.
@@ -30,6 +31,8 @@ Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/
 
 - Config: `sources/userscripts.json`
 - Local files: `sources/userscripts/<target>/<category>/<key>.user.js`
+- Remote patches: `sources/userscripts/<target>/<category>/<key>.patch.json`
+- Patched files: `dist/userscripts/<target>/<category>/<key>.user.js`
 - Generated config: `dist/userscripts.json`
 
 Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js).
@@ -45,9 +48,9 @@ npm run format
 npm run validate
 ```
 
-`npm run format` normalizes config values, sorts entries by target, category,
-and key, organizes local files, and removes empty folders. `global` and `other`
-sort last.
+`npm run format` normalizes and sorts configs, organizes local files, creates or
+removes remote patch files, and deletes empty folders. `global` and `other` sort
+last.
 
 `npm ci` installs the pre-commit formatting hook. Pull requests validate the
 configs and filters. Pushes to `main` rebuild `dist/`.

@@ -1,0 +1,9 @@
+{
+  "replacements": [
+    {
+      "pattern": "^!(?=(?:\\[\\$path=[^\\]]+\\])?(?:m\\.)?youtube\\.com##)",
+      "flags": "gm",
+      "replacement": ""
+    }
+  ]
+}

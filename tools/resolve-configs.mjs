@@ -1,4 +1,4 @@
-import { mkdir, readFile, stat, writeFile } from 'node:fs/promises';
+import { mkdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 
 import {
@@ -6,6 +6,12 @@ import {
     slugPattern,
     targetPattern,
 } from './config-definitions.mjs';
+import {
+    applyRemotePatch,
+    fetchRemoteText,
+    readRemotePatch,
+    remotePatchRelativePath,
+} from './remote-patches.mjs';
 
 const root = resolve(import.meta.dirname, '..');
 const rawRoot =
@@ -127,6 +133,7 @@ const resolveConfig = async ({
     }
 
     const collection = {};
+    const generatedFiles = [];
     const allowedEntryFields = new Set(entryFields);
     if (allowedPlatforms !== undefined) {
         allowedEntryFields.add('platforms');
@@ -205,6 +212,33 @@ const resolveConfig = async ({
             resolvedUrl = new URL(`${localDirectory}/${encodedPath}`, rawRoot);
         } else {
             resolvedUrl = requireHttpsUrl(entrySource, `${entryPath}.source`);
+            const patchRelativePath = remotePatchRelativePath(
+                entry.target,
+                entry.category,
+                name,
+            );
+            const patchLabel = `${localDirectory}/${patchRelativePath}`;
+            const patch = await readRemotePatch(
+                resolve(root, localDirectory, patchRelativePath),
+                patchLabel,
+            );
+
+            if (collectionName === 'scripts' && patch.replacements.length > 0) {
+                const remoteContents = await fetchRemoteText(
+                    resolvedUrl,
+                    `${entryPath}.source`,
+                );
+                const outputRelativePath = `userscripts/${entry.target}/${entry.category}/${name}${localFileSuffix}`;
+                generatedFiles.push({
+                    outputRelativePath,
+                    contents: applyRemotePatch(
+                        remoteContents,
+                        patch,
+                        patchLabel,
+                    ),
+                });
+                resolvedUrl = new URL(`dist/${outputRelativePath}`, rawRoot);
+            }
         }
 
         if (
@@ -232,6 +266,7 @@ const resolveConfig = async ({
     return {
         outputPath,
         value: { ...source, [collectionName]: collection },
+        generatedFiles,
     };
 };
 
@@ -241,8 +276,17 @@ for (const definition of configDefinitions) {
 }
 
 const distDir = resolve(root, 'dist');
-for (const { outputPath, value } of outputs) {
+await rm(resolve(distDir, 'userscripts'), { recursive: true, force: true });
+for (const { outputPath, value, generatedFiles } of outputs) {
     const destination = resolve(distDir, outputPath);
     await mkdir(dirname(destination), { recursive: true });
     await writeFile(destination, `${JSON.stringify(value, null, 2)}\n`);
+    for (const generatedFile of generatedFiles) {
+        const generatedPath = resolve(
+            distDir,
+            generatedFile.outputRelativePath,
+        );
+        await mkdir(dirname(generatedPath), { recursive: true });
+        await writeFile(generatedPath, generatedFile.contents);
+    }
 }
