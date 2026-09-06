@@ -38,7 +38,8 @@ Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/
 Patch replacements use `{ from, to }`. `from` can be text or a regular expression.
 
 Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js).
-Open a raw userscript config page, click the bottom-right button, and confirm.
+Open a raw userscript config page, click the bottom-right button, then install or
+skip each script. `Download all` saves the scripts as `userscripts.zip`.
 
 ## Development
 
