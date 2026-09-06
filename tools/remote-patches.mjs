@@ -5,8 +5,25 @@ const isObject = (value) =>
 
 export const createRemotePatch = (source) => ({ source, replacements: [] });
 
-export const remotePatchRelativePath = (target, category, name) =>
-    `${target}/${category}/${name}.patch.json`;
+export const remotePatchRelativePath = (target, name) =>
+    `${target}/${name}.patch.mjs`;
+
+export const serializeRemotePatch = ({ source, replacements }) => {
+    const rules = replacements
+        .map(
+            ({ from, to }) => `
+    {
+        from: ${typeof from === 'string' ? JSON.stringify(from) : `/${from.source}/${from.flags}`},
+        to: ${JSON.stringify(to)},
+    },`,
+        )
+        .join('');
+    return `export default {
+    source: ${JSON.stringify(source)},
+    replacements: [${rules}
+    ],
+};\n`;
+};
 
 export const readRemotePatch = async (path, label) => {
     let contents;
@@ -19,15 +36,18 @@ export const readRemotePatch = async (path, label) => {
         throw error;
     }
 
-    let patch;
+    let imported;
     try {
-        patch = JSON.parse(contents);
+        imported = await import(
+            `data:text/javascript;charset=utf-8,${encodeURIComponent(contents)}`
+        );
     } catch (error) {
-        throw new Error(`${label} is not valid JSON: ${error.message}`);
+        throw new Error(`${label} is invalid: ${error.message}`);
     }
+    const patch = imported.default;
 
     if (!isObject(patch)) {
-        throw new Error(`${label} must contain a JSON object`);
+        throw new Error(`${label} must default-export an object`);
     }
     const unknownFields = Object.keys(patch).filter(
         (field) => !['source', 'replacements'].includes(field),
@@ -59,36 +79,33 @@ export const readRemotePatch = async (path, label) => {
             throw new Error(`${rulePath} must be an object`);
         }
         const unknownRuleFields = Object.keys(replacement).filter(
-            (field) => !['flags', 'pattern', 'replacement'].includes(field),
+            (field) => !['from', 'to'].includes(field),
         );
         if (unknownRuleFields.length > 0) {
             throw new Error(
                 `${rulePath} has unknown fields: ${unknownRuleFields.join(', ')}`,
             );
         }
-        if (
-            typeof replacement.pattern !== 'string' ||
-            replacement.pattern === ''
-        ) {
-            throw new Error(`${rulePath}.pattern must be a non-empty string`);
+        if (!(
+            replacement.from instanceof RegExp ||
+            (typeof replacement.from === 'string' && replacement.from !== '')
+        )) {
+            throw new Error(
+                `${rulePath}.from must be a non-empty string or regular expression`,
+            );
         }
-        if (typeof replacement.replacement !== 'string') {
-            throw new Error(`${rulePath}.replacement must be a string`);
+        if (typeof replacement.to !== 'string') {
+            throw new Error(`${rulePath}.to must be a string`);
         }
-        const flags = replacement.flags ?? 'g';
-        if (typeof flags !== 'string') {
-            throw new Error(`${rulePath}.flags must be a string`);
-        }
-        try {
-            new RegExp(replacement.pattern, flags);
-        } catch (error) {
-            throw new Error(`${rulePath} is invalid: ${error.message}`);
-        }
-
         return {
-            pattern: replacement.pattern,
-            flags,
-            replacement: replacement.replacement,
+            from:
+                typeof replacement.from === 'string'
+                    ? replacement.from
+                    : new RegExp(
+                          replacement.from.source,
+                          replacement.from.flags,
+                      ),
+            to: replacement.to,
         };
     });
 
@@ -106,14 +123,26 @@ export const fetchRemoteText = async (url, label) => {
 export const applyRemotePatch = (contents, patch, label) => {
     let result = contents;
     for (const [index, replacement] of patch.replacements.entries()) {
-        const regex = new RegExp(replacement.pattern, replacement.flags);
-        if (!regex.test(result)) {
+        const from =
+            typeof replacement.from === 'string'
+                ? replacement.from
+                : new RegExp(replacement.from.source, replacement.from.flags);
+        const matches =
+            typeof from === 'string'
+                ? result.includes(from)
+                : from.test(result);
+        if (!matches) {
             throw new Error(
-                `${label}.replacements.${index}.pattern did not match`,
+                `${label}.replacements.${index}.from did not match`,
             );
         }
-        regex.lastIndex = 0;
-        result = result.replace(regex, replacement.replacement);
+        if (from instanceof RegExp) {
+            from.lastIndex = 0;
+        }
+        result =
+            typeof from === 'string'
+                ? result.replaceAll(from, replacement.to)
+                : result.replace(from, replacement.to);
     }
     return result;
 };

@@ -1,0 +1,4 @@
+export default {
+    source: 'https://update.greasyfork.org/scripts/525416/YouTube%20Safari%20iOS%20PiP%20Block%20Unblocker.user.js',
+    replacements: [],
+};

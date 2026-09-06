@@ -1,0 +1,4 @@
+export default {
+    source: 'https://update.greasyfork.org/scripts/527303/Auto%20Complete%20Deck.user.js',
+    replacements: [],
+};

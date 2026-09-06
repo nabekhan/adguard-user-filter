@@ -174,7 +174,7 @@ const resolveConfig = async ({
         let resolvedUrl;
         if (!/^[a-z][a-z\d+.-]*:/i.test(entrySource)) {
             const filename = `${name}${localFileSuffix}`;
-            const expectedFile = `${entry.target}/${entry.category}/${filename}`;
+            const expectedFile = `${entry.target}/${filename}`;
             if (entrySource !== expectedFile) {
                 throw new Error(
                     `${entryPath}.source must be organized as ${expectedFile}`,
@@ -214,7 +214,6 @@ const resolveConfig = async ({
             resolvedUrl = requireHttpsUrl(entrySource, `${entryPath}.source`);
             const patchRelativePath = remotePatchRelativePath(
                 entry.target,
-                entry.category,
                 name,
             );
             const patchLabel = `${localDirectory}/${patchRelativePath}`;

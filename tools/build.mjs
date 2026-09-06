@@ -118,11 +118,7 @@ for (const { category, name, platforms, target, url } of enabled) {
     const normalizedUrl = new URL(url).href;
     let localPath = localFilterPath(normalizedUrl);
     if (localPath === undefined) {
-        const patchRelativePath = remotePatchRelativePath(
-            target,
-            category,
-            name,
-        );
+        const patchRelativePath = remotePatchRelativePath(target, name);
         const patchLabel = `sources/filters/${patchRelativePath}`;
         const patch = await readRemotePatch(
             resolve(localFiltersDir, patchRelativePath),

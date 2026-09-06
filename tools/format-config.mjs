@@ -10,16 +10,26 @@ import {
 } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import slugifyText from '@sindresorhus/slugify';
-import { format as formatWithPrettier } from 'prettier';
+import {
+    format as formatWithPrettier,
+    resolveConfig as resolvePrettierConfig,
+} from 'prettier';
 
 import { configDefinitions, targetPattern } from './config-definitions.mjs';
 import {
     createRemotePatch,
     readRemotePatch,
     remotePatchRelativePath,
+    serializeRemotePatch,
 } from './remote-patches.mjs';
 
 const root = resolve(import.meta.dirname, '..');
+const formatFile = async (source, path, parser) =>
+    formatWithPrettier(source, {
+        ...((await resolvePrettierConfig(path)) ?? {}),
+        filepath: path,
+        parser,
+    });
 const collator = new Intl.Collator('en', {
     numeric: true,
     sensitivity: 'base',
@@ -168,7 +178,7 @@ const normalizeCollection = (
                   );
         let normalizedSource = source.value;
         if (source.local) {
-            normalizedSource = `${target}/${category}/${key}${localFileSuffix}`;
+            normalizedSource = `${target}/${key}${localFileSuffix}`;
 
             if (normalizedSource !== source.value) {
                 moves.push({
@@ -189,10 +199,10 @@ const normalizeCollection = (
             remotePatches.push({
                 path: resolveWithin(
                     localDirectory,
-                    remotePatchRelativePath(target, category, key),
+                    remotePatchRelativePath(target, key),
                     `${entryPath} patch`,
                 ),
-                label: `${localDirectory}/${remotePatchRelativePath(target, category, key)}`,
+                label: `${localDirectory}/${remotePatchRelativePath(target, key)}`,
                 source: source.value,
             });
         }
@@ -301,7 +311,11 @@ const findRemotePatches = async (directory) => {
         const path = resolve(directory, entry.name);
         if (entry.isDirectory()) {
             patches.push(...(await findRemotePatches(path)));
-        } else if (entry.isFile() && entry.name.endsWith('.patch.json')) {
+        } else if (
+            entry.isFile() &&
+            (entry.name.endsWith('.patch.json') ||
+                entry.name.endsWith('.patch.mjs'))
+        ) {
             patches.push(path);
         }
     }
@@ -331,13 +345,14 @@ for (const definition of configDefinitions) {
             slugsByOriginal.get(config.requires) ??
             normalizeSlug(config.requires, `${sourcePath}.requires`);
     }
-    const formatted = await formatWithPrettier(
+    const formatted = await formatFile(
         JSON.stringify(
             { ...normalizedConfig, [collectionName]: collection },
             null,
             2,
         ),
-        { parser: 'json' },
+        configPath,
+        'json',
     );
 
     if (checking && source !== formatted) {
@@ -354,16 +369,13 @@ for (const definition of configDefinitions) {
                 remotePatch.path,
                 remotePatch.label,
             );
-            const formatted = await formatWithPrettier(
-                JSON.stringify(
-                    {
-                        source: remotePatch.source,
-                        replacements: patch.replacements,
-                    },
-                    null,
-                    2,
-                ),
-                { parser: 'json' },
+            const formatted = await formatFile(
+                serializeRemotePatch({
+                    source: remotePatch.source,
+                    replacements: patch.replacements,
+                }),
+                remotePatch.path,
+                'babel',
             );
             const current = await readFile(remotePatch.path, 'utf8');
             if (checking && current !== formatted) {
@@ -409,10 +421,7 @@ if (!checking) {
     await applyMoves(plans.flatMap(({ moves }) => moves));
     for (const { path, source } of missingRemotePatches) {
         await mkdir(dirname(path), { recursive: true });
-        await writeFile(
-            path,
-            `${JSON.stringify(createRemotePatch(source), null, 2)}\n`,
-        );
+        await writeFile(path, serializeRemotePatch(createRemotePatch(source)));
     }
     for (const { configPath, formatted } of plans) {
         await writeFile(configPath, formatted);

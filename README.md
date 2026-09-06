@@ -6,8 +6,8 @@
 ## Filters
 
 - Config: `sources/filter.json`
-- Local files: `sources/filters/<target>/<category>/<key>.txt`
-- Remote patches: `sources/filters/<target>/<category>/<key>.patch.json`
+- Local files: `sources/filters/<target>/<key>.txt`
+- Remote patches: `sources/filters/<target>/<key>.patch.mjs`
 - Generated config: `dist/filter.json`
 
 Use `global` for multi-site rules. `source` is a local path or HTTPS URL.
@@ -30,12 +30,14 @@ Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/
 ## Userscripts
 
 - Config: `sources/userscripts.json`
-- Local files: `sources/userscripts/<target>/<category>/<key>.user.js`
-- Remote patches: `sources/userscripts/<target>/<category>/<key>.patch.json`
+- Local files: `sources/userscripts/<target>/<key>.user.js`
+- Remote patches: `sources/userscripts/<target>/<key>.patch.mjs`
 - Patched files: `dist/userscripts/<key>.user.js`
 - Generated config: `dist/userscripts.json`
 
-Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js).
+Patch replacements use `{ from, to }`. `from` can be text or a regular expression.
+
+Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js).
 Open a raw userscript config page, click the bottom-right button, and confirm.
 
 ## Development

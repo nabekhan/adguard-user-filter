@@ -51,7 +51,7 @@
       "category": "tools",
       "enabled": true,
       "target": "global",
-      "source": "global/tools/userscript-installer.user.js"
+      "source": "global/userscript-installer.user.js"
     }
   }
 }
