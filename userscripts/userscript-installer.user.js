@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Personal Userscript Installer
 // @namespace    https://github.com/nabekhan/user-filter-scripts
-// @version      0.3.1
+// @version      0.3.2
 // @description  Installs enabled userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/user-filter-scripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/userscripts/userscript-installer.user.js
@@ -104,9 +104,9 @@
 
       const names = scripts.map(({ key }) => `• ${key}`).join('\n');
       const confirmed = window.confirm(
-        `Open ${scripts.length} userscript installation page${
+        `Valid userscript config. Install ${scripts.length} script${
           scripts.length === 1 ? '' : 's'
-        }?\n\n${names}\n\nConfirm each installation in your userscript manager.`,
+        }?\n\n${names}`,
       );
 
       if (confirmed) {
