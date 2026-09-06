@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Personal Userscript Installer
 // @namespace    https://github.com/nabekhan/user-filter-scripts
-// @version      0.3.0
+// @version      0.3.1
 // @description  Installs enabled userscripts from the current JSON config page.
 // @homepageURL  https://github.com/nabekhan/user-filter-scripts
 // @downloadURL  https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/userscripts/userscript-installer.user.js
@@ -152,20 +152,25 @@
 
   const button = document.createElement('button');
   button.type = 'button';
-  button.textContent = 'Install userscripts';
+  button.textContent = '⇩';
+  button.title = 'Install userscripts from this page';
+  button.setAttribute('aria-label', button.title);
   button.style.cssText = [
     'position: fixed',
-    'right: 20px',
-    'bottom: 20px',
+    'right: 8px',
+    'bottom: 8px',
     'z-index: 2147483647',
-    'padding: 10px 14px',
+    'width: 28px',
+    'height: 28px',
+    'padding: 0',
     'border: 1px solid #0969da',
-    'border-radius: 6px',
+    'border-radius: 50%',
     'background: #0969da',
     'color: white',
-    'font: 600 14px system-ui, sans-serif',
+    'font: 700 16px/1 system-ui, sans-serif',
+    'opacity: 0.65',
     'cursor: pointer',
-    'box-shadow: 0 2px 8px rgb(0 0 0 / 20%)',
+    'box-shadow: 0 1px 3px rgb(0 0 0 / 25%)',
   ].join(';');
   button.addEventListener('click', () => install(() => currentPageConfig));
 
