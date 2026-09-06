@@ -40,7 +40,9 @@ To include a remote list, give it a unique name and an HTTPS `url`:
 Remote lists are downloaded when the filter is built and compiled into every
 compatible platform subscription. Pin the URL to a release or commit when you
 need reproducible builds; a URL that tracks the latest version can change the
-generated subscriptions without a corresponding source change here.
+generated subscriptions without a corresponding source change here. Source
+comments are stripped from generated subscriptions to keep them small; AdGuard's
+required subscription metadata header is retained.
 
 ## Build
 

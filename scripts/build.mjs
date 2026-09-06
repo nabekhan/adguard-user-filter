@@ -45,8 +45,8 @@ const distDir = resolve(root, 'dist');
 const template = [
     ...enabled.map(({ name, url }) => (
         url === undefined
-            ? `@include ../../../lists/${name}.txt /ignoreTrustLevel`
-            : `@include ${JSON.stringify(new URL(url).href)}`
+            ? `@include ../../../lists/${name}.txt /stripComments /ignoreTrustLevel`
+            : `@include ${JSON.stringify(new URL(url).href)} /stripComments`
     )),
     '',
 ].join('\n');
