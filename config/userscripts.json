@@ -1,7 +1,7 @@
 {
   "title": "Userscripts",
   "description": "Commonly used userscripts for various websites.",
-  "homepage": "https://github.com/nabekhan/user-filter-scripts",
+  "homepage": "https://github.com/nabekhan/web-customizations",
   "requires": "userscript-installer",
   "scripts": {
     "dont-track-me-google": {

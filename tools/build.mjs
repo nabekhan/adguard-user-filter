@@ -9,7 +9,7 @@ const config = JSON.parse(
     await readFile(resolve(root, 'dist', 'filters', 'config.json'), 'utf8'),
 );
 const rawFiltersUrl = new URL(
-    'https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/sources/filters/',
+    'https://raw.githubusercontent.com/nabekhan/web-customizations/main/sources/filters/',
 );
 const localFiltersDir = resolve(root, 'sources', 'filters');
 const allowedPlatformFlags = new Set(Object.values(filterPlatformFlags));

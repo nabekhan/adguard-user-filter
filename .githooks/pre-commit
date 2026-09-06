@@ -2,8 +2,8 @@
 
 set -eu
 
-before_format=$(mktemp -t user-filter-scripts-before.XXXXXX)
-after_format=$(mktemp -t user-filter-scripts-after.XXXXXX)
+before_format=$(mktemp -t web-customizations-before.XXXXXX)
+after_format=$(mktemp -t web-customizations-after.XXXXXX)
 trap 'rm -f "$before_format" "$after_format"' EXIT HUP INT TERM
 
 git diff --binary >"$before_format"
@@ -23,7 +23,7 @@ else
         exit 1
     fi
 
-    "$nix_command" shell nixpkgs#nodejs_22 --command npm run format
+    "$nix_command" shell nixpkgs#nodejs_24 --command npm run format
 fi
 
 git diff --binary >"$after_format"

@@ -1,7 +1,7 @@
 {
   "title": "Userscripts",
   "description": "Commonly used userscripts for various websites.",
-  "homepage": "https://github.com/nabekhan/user-filter-scripts",
+  "homepage": "https://github.com/nabekhan/web-customizations",
   "requires": "userscript-installer",
   "scripts": {
     "dont-track-me-google": {
@@ -53,7 +53,7 @@
       "category": "tools",
       "enabled": true,
       "website": "global",
-      "url": "https://raw.githubusercontent.com/nabekhan/user-filter-scripts/main/sources/userscripts/global/tools/userscript-installer.user.js"
+      "url": "https://raw.githubusercontent.com/nabekhan/web-customizations/main/sources/userscripts/global/tools/userscript-installer.user.js"
     }
   }
 }
