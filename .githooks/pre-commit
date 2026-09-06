@@ -2,8 +2,8 @@
 
 set -eu
 
-before_format=$(mktemp -t web-customizations-before.XXXXXX)
-after_format=$(mktemp -t web-customizations-after.XXXXXX)
+before_format=$(mktemp -t filters-userscripts-before.XXXXXX)
+after_format=$(mktemp -t filters-userscripts-after.XXXXXX)
 trap 'rm -f "$before_format" "$after_format"' EXIT HUP INT TERM
 
 git diff --binary >"$before_format"

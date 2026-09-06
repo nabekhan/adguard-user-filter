@@ -1,7 +1,7 @@
-# Web customizations
+# Filters and userscripts
 
-[Userscripts config](https://raw.githubusercontent.com/nabekhan/web-customizations/main/dist/userscripts/config.json)
-· [Filter config](https://raw.githubusercontent.com/nabekhan/web-customizations/main/dist/filters/config.json)
+[Userscripts config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts/config.json)
+· [Filter config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filters/config.json)
 
 ## Filters
 
@@ -24,7 +24,7 @@ Optional platforms: `android`, `chromium`, `firefox`, `ios`, `linux`, `mac`,
 | Chromium browser extension | `dist/filters/chromium.txt` |
 | Firefox browser extension  | `dist/filters/firefox.txt`  |
 
-Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/web-customizations/main/`
+Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/`
 
 ## Userscripts
 
@@ -34,7 +34,7 @@ Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/web-customizations/m
 
 Optional `platforms` values are recommendations and do not affect installation.
 
-Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/web-customizations/main/sources/userscripts/global/tools/userscript-installer.user.js).
+Install the [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js).
 Open a raw userscript config page, click the bottom-right button, and confirm.
 
 ## Development

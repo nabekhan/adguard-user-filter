@@ -1,7 +1,7 @@
 {
   "title": "Filters",
   "description": "Lists of filters for various websites.",
-  "homepage": "https://github.com/nabekhan/web-customizations",
+  "homepage": "https://github.com/nabekhan/filters-userscripts",
   "expires": "1 week",
   "lists": {
     "siri-ai-enable": {
@@ -12,7 +12,7 @@
         "adguard_app_ios",
         "adguard_app_mac"
       ],
-      "url": "https://raw.githubusercontent.com/nabekhan/web-customizations/main/sources/filters/icloud/other/siri-ai-enable.txt"
+      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/filters/icloud/other/siri-ai-enable.txt"
     },
     "norsagir-youtube-hide-shorts": {
       "category": "nuisances",
@@ -24,7 +24,7 @@
       "category": "nuisances",
       "enabled": true,
       "website": "youtube",
-      "url": "https://raw.githubusercontent.com/nabekhan/web-customizations/main/sources/filters/youtube/nuisances/norsagir-youtube-shorts-extras.txt"
+      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/filters/youtube/nuisances/norsagir-youtube-shorts-extras.txt"
     }
   }
 }

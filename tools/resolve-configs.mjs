@@ -9,7 +9,7 @@ import {
 
 const root = resolve(import.meta.dirname, '..');
 const rawRoot =
-    'https://raw.githubusercontent.com/nabekhan/web-customizations/main/';
+    'https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/';
 const entryFields = new Set(['category', 'enabled', 'file', 'url', 'website']);
 
 const isObject = (value) =>

@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         Userscript Installer
-// @namespace    https://github.com/nabekhan/web-customizations
+// @namespace    https://github.com/nabekhan/filters-userscripts
 // @version      0.4.0
 // @description  Installs enabled userscripts from the current JSON config page.
-// @homepageURL  https://github.com/nabekhan/web-customizations
-// @downloadURL  https://raw.githubusercontent.com/nabekhan/web-customizations/main/sources/userscripts/global/tools/userscript-installer.user.js
-// @updateURL    https://raw.githubusercontent.com/nabekhan/web-customizations/main/sources/userscripts/global/tools/userscript-installer.user.js
+// @homepageURL  https://github.com/nabekhan/filters-userscripts
+// @downloadURL  https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js
+// @updateURL    https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/tools/userscript-installer.user.js
 // @match        https://*/*
 // @grant        GM.openInTab
 // @grant        GM.registerMenuCommand
