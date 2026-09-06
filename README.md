@@ -1,8 +1,8 @@
 # Filters and userscripts
 
-[Userscripts config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts.json)
-
 [Filter config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filter.json)
+
+[Userscripts config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts.json) - Requires: [Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js)
 
 ## Filters
 
@@ -32,8 +32,6 @@ Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/
 - Patched files: `dist/userscripts/<key>.user.js`
 - Generated config: `dist/userscripts.json`
 - Patch entry: `{ from, to }`
-
-[Install Userscript Installer](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js)
 
 ## Development
 
