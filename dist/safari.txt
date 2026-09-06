@@ -1,8 +1,8 @@
-! Checksum: uoceypvlTws5CkuY6dHj4w
+! Checksum: 8/rmdwGeDq4SZSkv6FBAsQ
 ! Title: Nabeel's personal filter
 ! Description: Personal AdGuard rules compiled for each supported platform.
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-06T18:00:13+00:00
+! TimeUpdated: 2026-09-06T18:00:55+00:00
 ! Expires: 1 week (update frequency)
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
 youtube.com#?#[page-subtype="channels"] ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:contains(/(^| )Shorts( |$)/i))
