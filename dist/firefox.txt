@@ -1,8 +1,8 @@
-! Checksum: YxlYuxjgXZGITGYKDnt4TQ
+! Checksum: jEq6VCSNsDwBlOFeRfi3dQ
 ! Title: Nabeel's AdGuard filter
 ! Description: Personal lists compiled for supported platforms.
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-06T18:39:41+00:00
+! TimeUpdated: 2026-09-06T18:40:40+00:00
 ! Expires: 10 days (update frequency)
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
 youtube.com#?#[page-subtype="channels"] ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:contains(/(^| )Shorts( |$)/i))
