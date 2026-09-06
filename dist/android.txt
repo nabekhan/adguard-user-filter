@@ -1,8 +1,8 @@
-! Checksum: fQBY0daxS9i53IIZq6OQSA
+! Checksum: 0BcRzBigzIlRQbYIJF64Vg
 ! Title: Personal AdGuard filter
 ! Description: Personal lists compiled for supported platforms.
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-06T19:28:43+00:00
+! TimeUpdated: 2026-09-06T19:29:37+00:00
 ! Expires: 1 week (update frequency)
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
 youtube.com#?#[page-subtype="channels"] ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:contains(/(^| )Shorts( |$)/i))
