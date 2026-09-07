@@ -134,7 +134,6 @@ const normalizeCollection = (
 ) => {
     const normalized = [];
     const originalsBySlug = new Map();
-    const slugsByOriginal = new Map();
     const localFiles = [];
     const moves = [];
     const remotePatches = [];
@@ -225,7 +224,6 @@ const normalizeCollection = (
         };
 
         originalsBySlug.set(key, name);
-        slugsByOriginal.set(name, key);
         normalized.push([key, normalizedValue]);
     }
 
@@ -245,7 +243,6 @@ const normalizeCollection = (
         localFiles,
         moves,
         remotePatches,
-        slugsByOriginal,
     };
 };
 
@@ -366,18 +363,13 @@ for (const definition of configDefinitions) {
     const configPath = resolve(root, sourcePath);
     const source = await readFile(configPath, 'utf8');
     const config = JSON.parse(source);
-    const { collection, localFiles, moves, remotePatches, slugsByOriginal } =
+    const { collection, localFiles, moves, remotePatches } =
         normalizeCollection(
             config[collectionName] ?? {},
             `${sourcePath}.${collectionName}`,
             definition,
         );
     const normalizedConfig = { ...config };
-    if (typeof config.requires === 'string') {
-        normalizedConfig.requires =
-            slugsByOriginal.get(config.requires) ??
-            normalizeSlug(config.requires, `${sourcePath}.requires`);
-    }
     const formatted = await formatFile(
         JSON.stringify(
             { ...normalizedConfig, [collectionName]: collection },

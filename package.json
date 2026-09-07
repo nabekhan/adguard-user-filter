@@ -9,7 +9,7 @@
   "scripts": {
     "prepare": "node tools/install-git-hooks.mjs",
     "prebuild": "npm run format:check",
-    "build": "node tools/build.mjs",
+    "build": "node tools/build.mjs && node tools/build-site.mjs",
     "format": "node tools/format-config.mjs && prettier --write . --ignore-unknown",
     "format:check": "node tools/format-config.mjs --check && prettier --check . --ignore-unknown",
     "format:prune": "node tools/format-config.mjs --prune-local && prettier --write . --ignore-unknown",

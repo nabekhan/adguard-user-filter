@@ -2,7 +2,6 @@
   "title": "Personal Userscripts",
   "description": "Userscripts for various websites.",
   "homepage": "https://github.com/nabekhan/filters-userscripts",
-  "requires": "userscript-installer",
   "scripts": {
     "dont-track-me-google": {
       "category": "tools",
@@ -48,12 +47,6 @@
       "enabled": true,
       "target": "global",
       "url": "https://update.greasyfork.org/scripts/485772/FMHY%20Base64%20Auto%20Decoder.user.js"
-    },
-    "userscript-installer": {
-      "category": "tools",
-      "enabled": true,
-      "target": "global",
-      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/userscripts/global/userscript-installer.user.js"
     }
   }
 }

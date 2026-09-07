@@ -151,15 +151,6 @@ const resolveConfig = async ({
         throw new Error(`${sourcePath}.${collectionName} must be an object`);
     }
 
-    if (
-        source.requires !== undefined &&
-        !Object.hasOwn(entries, source.requires)
-    ) {
-        throw new Error(
-            `${sourcePath}.requires must name an entry in ${collectionName}`,
-        );
-    }
-
     const collection = {};
     const generatedFiles = [];
     const allowedEntryFields = new Set(entryFields);

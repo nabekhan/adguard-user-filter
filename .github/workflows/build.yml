@@ -1,4 +1,4 @@
-name: Build filters
+name: Build
 
 on:
   workflow_dispatch:
@@ -11,6 +11,8 @@ on:
 
 permissions:
   contents: write
+  id-token: write
+  pages: write
 
 jobs:
   build:
@@ -35,3 +37,23 @@ jobs:
             git commit -m 'chore: format and rebuild filters [skip ci]'
             git push
           }
+      - if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@v6
+      - if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: .build/site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: true
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5

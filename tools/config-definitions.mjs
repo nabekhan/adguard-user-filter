@@ -30,7 +30,7 @@ export const configDefinitions = [
         localFileSuffix: '.user.js',
         allowedPlatforms: platformNames,
         requiredStringFields: ['title', 'description', 'homepage'],
-        optionalStringFields: ['requires'],
+        optionalStringFields: [],
     },
 ];
 
