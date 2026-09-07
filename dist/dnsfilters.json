@@ -9,18 +9,24 @@
       "enabled": true,
       "target": "hagezi",
       "platforms": [
-        "desktop-server"
+        "desktop"
       ],
       "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.txt"
     },
-    "hagezi-tif-medium": {
-      "category": "security",
+    "hagezi-pro-mini": {
+      "category": "privacy",
       "enabled": true,
       "target": "hagezi",
       "platforms": [
         "mobile"
       ],
-      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.medium.txt"
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.mini.txt"
+    },
+    "hagezi-tif-mini": {
+      "category": "security",
+      "enabled": true,
+      "target": "hagezi",
+      "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/tif.mini.txt"
     }
   }
 }
