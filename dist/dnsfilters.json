@@ -4,6 +4,12 @@
   "homepage": "https://nabekhan.github.io/filters-userscripts/",
   "expires": "1 week",
   "lists": {
+    "siri-ai-enable": {
+      "category": "other",
+      "enabled": true,
+      "target": "icloud",
+      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/dnsfilters/icloud/siri-ai-enable.txt"
+    },
     "adguard-sdns-filter": {
       "category": "privacy",
       "enabled": true,

@@ -1,11 +1,11 @@
-! Checksum: bsqirDzLJ56YN5ENshsNTA
+! Checksum: i5WAa2TT9PZ45FYxPryNzg
 ! Title: Personal Ad Filters
 ! Description: Lists of ad filters for various websites.
 ! Homepage: https://nabekhan.github.io/filters-userscripts/
 ! Platform: Safari
-! Rules: 316627
+! Rules: 316649
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-07T02:24:47+00:00
+! TimeUpdated: 2026-09-07T02:33:47+00:00
 ! Expires: 1 week (update frequency)
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
 youtube.com#?#[page-subtype="channels"] ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:contains(/(^| )Shorts( |$)/i))
@@ -77947,6 +77947,7 @@ browsershots.org#@#.advert_area
 ||888pyxeo.net^
 ||88a5ce7125.com^
 ||88a743c835.com^
+||88c9e16bf6.com^
 ||88ddebd3d3.com^
 ||88e0dcb063.com^
 ||88eq7spm.de^
@@ -81108,6 +81109,7 @@ browsershots.org#@#.advert_area
 ||b6zvtfvngrruxjkwcqwvzmfxo1t.cfd^
 ||b7360c81c8.com^
 ||b7510.com^
+||b7644e75ce.com^
 ||b7ec509038.com^
 ||b8036a31fa.com^
 ||b8d682e30f.com^
@@ -83276,6 +83278,7 @@ browsershots.org#@#.advert_area
 ||bwrpihqndmsio.site^
 ||bwsibkepyqxts.website^
 ||bwttasdajpduj.site^
+||bwtttkphsxxsx.space^
 ||bwtubspjogxsz.space^
 ||bwvffebbohhiv.site^
 ||bwvgtmxrqmkwv.website^
@@ -84862,6 +84865,7 @@ browsershots.org#@#.advert_area
 ||codettegravid.cyou^
 ||codextutus.com^
 ||codzcuagowz.com^
+||coeffvibices.shop^
 ||coefslew.shop^
 ||coeliabumpee.com^
 ||coelinpinbush.shop^
@@ -90613,6 +90617,7 @@ browsershots.org#@#.advert_area
 ||fenoofaussut.net^
 ||fenrirataunto.qpon^
 ||fensendmost.qpon^
+||feoffeevenomer.shop^
 ||feorljmstgdhb.space^
 ||fepqwzejwtlmx.online^
 ||feqgpykeuppfi.space^
@@ -92693,6 +92698,7 @@ browsershots.org#@#.advert_area
 ||gkrtmc.com^
 ||gkszvanzrueuf.space^
 ||gktcdiszwmphyf.com^
+||gkwmamtrqhiycrp.com^
 ||gkxixncsphfli.online^
 ||gkxuifkljnmet.online^
 ||gkyaggtewwucj.online^
@@ -95489,6 +95495,7 @@ browsershots.org#@#.advert_area
 ||igshhiazyqoxv.space^
 ||igszvdjpvxqdt.online^
 ||igtjqemgdlibm.site^
+||igukzvauqhpsb.space^
 ||igunutotpusx.com^
 ||igvkixoxvsvih.space^
 ||igvnfhtdjqkqx.website^
@@ -96845,6 +96852,7 @@ browsershots.org#@#.advert_area
 ||jbkueagfgwphk.online^
 ||jblaptokniuuu.website^
 ||jbldfugqruigf.website^
+||jbnkvvvgawjdd.site^
 ||jboppyhawqzfo.online^
 ||jboztgcwxnvoc.website^
 ||jbpqyfefyppfff.com^
@@ -100057,6 +100065,7 @@ browsershots.org#@#.advert_area
 ||lootsanenddimeric.cfd^
 ||looverolent.shop^
 ||lopcujih3eoi1coi7zvjqfm11hbv9.rest^
+||lopedcymolcommaes.qpon^
 ||loperbrattle.com^
 ||lopersmacabi.cyou^
 ||lophiiderugate.cfd^
@@ -105142,6 +105151,7 @@ browsershots.org#@#.advert_area
 ||ovaloidbizones.qpon^
 ||ovambofoud.shop^
 ||ovardu.com^
+||ovarianveneur.qpon^
 ||ovaringhazistryptic.cyou^
 ||ovegvmxxhspth.com^
 ||ovekrdngtazex.space^
@@ -110545,6 +110555,7 @@ browsershots.org#@#.advert_area
 ||rsgiafnwpmlffb.com^
 ||rsgumgvzqwnce.online^
 ||rsityexcellojapanelm.org^
+||rsjvzzhuunymr.space^
 ||rsogufleygbzr.store^
 ||rsonalrecomef.org^
 ||rsorkpwtboedu.website^
@@ -114915,6 +114926,7 @@ browsershots.org#@#.advert_area
 ||tgmbxplmlsclp.space^
 ||tgnoppvxz.com^
 ||tgowvecdkon.com^
+||tgtiwznmifgjh.website^
 ||tgtrjjlpjntes.space^
 ||tguyxzkrxgzqt.online^
 ||tgvtlpjqnsiwm.site^
@@ -122038,6 +122050,7 @@ browsershots.org#@#.advert_area
 ||yscuspceqmprq.site^
 ||ysesials.net^
 ||ysgvhmiwrvsvt.website^
+||ysieoscwufeki.site^
 ||ysjovdlklxecs.online^
 ||yskfsvgksetur.online^
 ||yskynwfcmivjo.online^
@@ -145801,6 +145814,14 @@ wegwandern.ch,compact-online.de#%#//scriptlet('trusted-click-element', 'dialog a
 cornhub.army#%#//scriptlet('trusted-click-element', 'dialog a[role="button"][data-order="0"][id]', '!real_cookie_banner-v:3_blog:1_path:0c09270')
 ||cookietrace.webequalty.com^$domain=sabancivakfi.org
 sabancivakfi.org###ez-banner[role="banner"]
+uszczelki-centrum.pl#%#//scriptlet('trusted-set-cookie', 'mycookies', '%7B%22ad_storage%22%3A%22denied%22%2C%22analytics_storage%22%3A%22denied%22%2C%22ad_personalization%22%3A%22denied%22%2C%22ad_user_data%22%3A%22denied%22%2C%22personalization_storage%22%3A%22denied%22%2C%22functionality_storage%22%3A%22granted%22%2C%22security_storage%22%3A%22granted%22%7D')
+sklep.toma.com.pl,filtry.sklep.pl#%#//scriptlet('set-cookie', 'cookies_message_bar_hidden', 'true')
+subiekt123.pl#%#//scriptlet('set-cookie', 'cp_010922', 'emptyArr')
+tabelaofert.pl#%#//scriptlet('trusted-set-cookie', 'to_ad_personalization', 'denied')
+tabelaofert.pl#%#//scriptlet('trusted-set-cookie', 'to_ad_storage', 'denied')
+tabelaofert.pl#%#//scriptlet('trusted-set-cookie', 'to_ad_user_data', 'denied')
+tabelaofert.pl#%#//scriptlet('trusted-set-cookie', 'to_analytics_storage', 'denied')
+tabelaofert.pl#%#//scriptlet('trusted-set-cookie', 'to_deva_accepted', 'granted')
 argenta.com.pl#%#//scriptlet('trusted-set-cookie', 'ccA', 'eyJuZWNlc3NhcnkiOnRydWUsIm1hcmtldGluZyI6ZmFsc2UsInBlcmZvcm1hbmNlIjpmYWxzZSwidmlld2VkIjp0cnVlfQ==')
 bookero.pl#%#//scriptlet('set-cookie', 'ss-cn-config-v2', 'emptyArr')
 promart.pe##body > div.gh-info-bottom:has(> div.cnt-text-info-cookie)
@@ -147977,7 +147998,7 @@ lequipe.fr#%#//scriptlet('trusted-click-element', 'button.Cmp__action--yes', '',
 hayatfinans.com.tr#%#//scriptlet('trusted-set-cookie', 'cookie-consent', '%7B%22RequiredCookies%22%3Atrue%2C%22FunctionalityAndPreferenceCookies%22%3Atrue%2C%22PerformanceAndAnalyticsCookies%22%3Afalse%2C%22TargetingOrAdvertisingCookies%22%3Afalse%7D')
 megagroup.ru##.mg-site-cookie
 elgin.com.br##app-politica-privacidade
-sklep-papierovo.pl,trasko.pl,altoserwis.pl,maire.cieszyn.pl,darmarko.pl,trenerjazdy.pl,quizgame.pl#%#//scriptlet('trusted-set-cookie', 'ww-cookie-settings', '%7B%22functional%22%3Atrue%2C%22preferences%22%3Afalse%2C%22statistics%22%3Afalse%2C%22marketing%22%3Afalse%7D')
+sufity-artdecor.pl,sklep-papierovo.pl,trasko.pl,altoserwis.pl,maire.cieszyn.pl,darmarko.pl,trenerjazdy.pl,quizgame.pl#%#//scriptlet('trusted-set-cookie', 'ww-cookie-settings', '%7B%22functional%22%3Atrue%2C%22preferences%22%3Afalse%2C%22statistics%22%3Afalse%2C%22marketing%22%3Afalse%7D')
 marktredwitz.de###usercentrics-button
 mypos.com#$#body { overflow: auto !important; padding-right: 0 !important; }
 mypos.com#$#.cookies-banner-wrapper { display: none !important; }
@@ -187644,6 +187665,7 @@ buttondown.email#@##subscribe-form
 ##head[prefix~="medium-com:"] ~ body .js-openInAppButton
 ##head[prefix~="medium-com:"] ~ body .js-postActionsBarContent > .js-readNextInteractions
 rxgo.com,alfastrah.ru,turkishairlines.com,atmos-tokyo.com,radarbox.com,ciceksepeti.com,rabota.by,temp-mail.org,ortobom.com.br,dicionarioinformal.com.br,5-fifth.com,news.sky.com,chat.babel.com,getwordly.com,school-turnup.com,naked-science.ru,vod.tvp.pl,tvn24.pl,m.lamoda.ru,lkfl2.nalog.ru,kocailem.com,dartworld.shopgate.com,m.alles10euro.de,dodopizza.ru,allo.ua,tempo.co,beymen.com,tvnmeteo.tvn24.pl,outsidetv.com,golfchannel.com,sportsnet.ca,euronews.com,pkobp.pl,tesco.hu,prima.hu,immobilienscout24.de,lcwaikiki.com,m.sigrun-woehr.com,transfermarkt.de,fragfinn.de,hh.ru,eraffe24.de,infranken.de,m.computeruniverse.net,m.emp.de,meduza.io##body .smartbanner
+delish.com##a[href="#main-content"] + nav > div[class] div[class*=" "]:has(img[alt="Delish App Banner Logo"])
 nefisyemektarifleri.com##.app-top-bar
 nefisyemektarifleri.com##.open-in-app-bar
 intersport.gr##img[alt="download app"]
