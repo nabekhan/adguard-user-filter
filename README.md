@@ -30,23 +30,24 @@
 - Local files: `sources/dnsfilters/<target>/<key>.txt`
 - Remote patches: `sources/dnsfilters/<target>/<key>.patch.mjs`
 - Generated config: `dist/dnsfilters.json`
-- Compiler: `@adguard/hostlist-compiler`, including its DNS `Validate`
-  transformation
+- Compiler: `@adguard/hostlist-compiler`
+- Validation: `Validate`, AGLint
 
 | Target  | Subscription path             |
 | ------- | ----------------------------- |
 | Mobile  | `dist/dnsfilters/mobile.txt`  |
 | Desktop | `dist/dnsfilters/desktop.txt` |
 
-For ad filters, DNS filters, and userscripts, use `platforms` to include only
-specific platforms or `excludePlatforms` to include every supported platform
-except those listed. The two fields cannot be combined on one entry.
+## Config
 
-The config files are the source of truth. `npm run format` creates a stub for
-each missing local source and a patch stub for each remote source. Use
-`npm run format:prune` to remove local files that are no longer configured.
-
-Raw URL prefix: `https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/`
+- `platforms`: included platforms
+- `excludePlatforms`: excluded platforms
+- `platforms` and `excludePlatforms` are mutually exclusive
+- Missing local sources: stubbed by `npm run format`
+- Missing remote patches: stubbed by `npm run format`
+- Unlisted local files: removed by `npm run format:prune`
+- Raw URL prefix:
+  `https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/`
 
 ## Userscripts
 
