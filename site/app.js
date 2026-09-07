@@ -123,18 +123,17 @@ const renderUserscripts = (config) => {
   previous.textContent = '‹';
   previous.title = 'Previous';
   previous.setAttribute('aria-label', 'Previous');
-  const install = document.createElement('a');
-  install.className = 'button primary';
-  install.textContent = 'Install';
-  install.target = '_blank';
-  install.rel = 'noopener';
+  const copyUrl = document.createElement('button');
+  copyUrl.className = 'button primary';
+  copyUrl.type = 'button';
+  copyUrl.textContent = 'Copy URL';
   const next = document.createElement('button');
   next.className = 'button';
   next.type = 'button';
   next.textContent = '›';
   next.title = 'Next';
   next.setAttribute('aria-label', 'Next');
-  actions.append(previous, install, next);
+  actions.append(previous, copyUrl, next);
   root.append(position, progress, name, details, actions);
 
   let current = Number.parseInt(sessionStorage.getItem('script-index'), 10);
@@ -142,7 +141,9 @@ const renderUserscripts = (config) => {
     current = 0;
   }
 
+  let resetCopyLabel;
   const show = (index) => {
+    clearTimeout(resetCopyLabel);
     current = index;
     const script = scripts[index];
     sessionStorage.setItem('script-index', String(index));
@@ -159,7 +160,9 @@ const renderUserscripts = (config) => {
         .join(', ') || 'All',
     );
     addDetail(details, 'Recommend', script.enabled ? 'Install' : 'Skip');
-    install.href = script.url;
+    copyUrl.textContent = 'Copy URL';
+    copyUrl.title = `Copy ${script.key} URL`;
+    copyUrl.setAttribute('aria-label', `Copy ${script.key} URL`);
     previous.disabled = index === 0;
     next.disabled = index === scripts.length - 1;
     for (const [markerIndex, marker] of markers.entries()) {
@@ -171,6 +174,18 @@ const renderUserscripts = (config) => {
     }
   };
 
+  copyUrl.addEventListener('click', async () => {
+    clearTimeout(resetCopyLabel);
+    try {
+      await copyText(scripts[current].url);
+      copyUrl.textContent = 'Copied!';
+    } catch {
+      copyUrl.textContent = 'Copy failed';
+    }
+    resetCopyLabel = setTimeout(() => {
+      copyUrl.textContent = 'Copy URL';
+    }, 1500);
+  });
   previous.addEventListener('click', () => show(current - 1));
   next.addEventListener('click', () => show(current + 1));
   show(current);
