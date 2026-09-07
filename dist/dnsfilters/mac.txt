@@ -1,10 +1,10 @@
-! Checksum: t8n3xkR1+y33fvKibcR+MA
+! Checksum: tPbIkKS+cHCLM//iXYgBrg
 ! Title: Personal DNS Filters
 ! Description: Lists of DNS filters for various websites and services.
 ! Homepage: https://nabekhan.github.io/filters-userscripts/
 ! Platform: Mac
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-07T01:08:17+00:00
+! TimeUpdated: 2026-09-07T01:09:16+00:00
 ! Expires: 1 week (update frequency)
 ||d-p-d-0027912.0013484922656.com^
 ||ad.001zb.com^
