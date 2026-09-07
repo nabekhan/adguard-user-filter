@@ -155,6 +155,7 @@ const resolveConfig = async ({
     const generatedFiles = [];
     const allowedEntryFields = new Set(entryFields);
     if (allowedPlatforms !== undefined) {
+        allowedEntryFields.add('excludePlatforms');
         allowedEntryFields.add('platforms');
     }
     for (const [name, entry] of Object.entries(entries)) {
@@ -186,8 +187,26 @@ const resolveConfig = async ({
             allowedPlatforms,
             `${entryPath}.platforms`,
         );
+        requirePlatforms(
+            entry.excludePlatforms,
+            allowedPlatforms,
+            `${entryPath}.excludePlatforms`,
+        );
+        if (
+            entry.platforms !== undefined &&
+            entry.excludePlatforms !== undefined
+        ) {
+            throw new Error(
+                `${entryPath} cannot define both platforms and excludePlatforms`,
+            );
+        }
 
-        const { platforms, source: entrySource, ...settings } = entry;
+        const {
+            excludePlatforms,
+            platforms,
+            source: entrySource,
+            ...settings
+        } = entry;
         requireString(entrySource, `${entryPath}.source`);
 
         let resolvedUrl;
@@ -282,6 +301,15 @@ const resolveConfig = async ({
 
         collection[name] = {
             ...settings,
+            ...(excludePlatforms === undefined
+                ? {}
+                : {
+                      excludePlatforms: excludePlatforms.map((platform) =>
+                          platformFlags === undefined
+                              ? platform
+                              : platformFlags[platform],
+                      ),
+                  }),
             ...(platforms === undefined
                 ? {}
                 : {

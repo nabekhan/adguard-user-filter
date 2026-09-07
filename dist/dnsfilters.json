@@ -1,0 +1,28 @@
+{
+  "title": "Personal DNS Filters",
+  "description": "Lists of DNS filters for various websites and services.",
+  "homepage": "https://nabekhan.github.io/filters-userscripts/",
+  "expires": "1 week",
+  "lists": {
+    "hagezi-pro": {
+      "category": "privacy",
+      "enabled": true,
+      "target": "hagezi",
+      "excludePlatforms": [
+        "android",
+        "ios"
+      ],
+      "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.txt"
+    },
+    "hagezi-tif-medium": {
+      "category": "security",
+      "enabled": true,
+      "target": "hagezi",
+      "platforms": [
+        "android",
+        "ios"
+      ],
+      "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.medium.txt"
+    }
+  }
+}

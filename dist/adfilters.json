@@ -1,6 +1,6 @@
 {
-  "title": "Personal Filters",
-  "description": "Lists of filters for various websites.",
+  "title": "Personal Ad Filters",
+  "description": "Lists of ad filters for various websites.",
   "homepage": "https://nabekhan.github.io/filters-userscripts/",
   "expires": "1 week",
   "lists": {
@@ -12,7 +12,7 @@
         "adguard_app_ios",
         "adguard_app_mac"
       ],
-      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/filters/icloud/siri-ai-enable.txt"
+      "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/adfilters/icloud/siri-ai-enable.txt"
     },
     "norsagir-youtube-hide-shorts": {
       "category": "nuisances",

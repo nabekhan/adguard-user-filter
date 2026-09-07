@@ -1,0 +1,29 @@
+! Checksum: 63tdHKZ+YLBc1G6MezAhSg
+! Title: Personal Ad Filters
+! Description: Lists of ad filters for various websites.
+! Homepage: https://nabekhan.github.io/filters-userscripts/
+! Platform: iOS
+! Version: 1.0.0.0
+! TimeUpdated: 2026-09-07T01:08:12+00:00
+! Expires: 1 week (update frequency)
+@@||metrics.icloud.com^
+youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
+youtube.com#?#[page-subtype="channels"] ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:contains(/(^| )Shorts( |$)/i))
+youtube.com##[page-subtype="subscriptions"] ytd-rich-section-renderer:has([is-shorts])
+youtube.com#?#[page-subtype="search"] grid-shelf-view-model:has(yt-section-header-view-model:has(yt-shelf-header-layout:contains(Shorts)))
+youtube.com#?#ytd-guide-entry-renderer:has(yt-formatted-string:contains(/^Shorts$/i))
+youtube.com##ytd-mini-guide-entry-renderer:has([title="Shorts"])
+youtube.com#?#[page-subtype="channels"] yt-tab-shape:contains(/^Shorts$/)
+youtube.com#?#[page-subtype="search"] yt-chip-cloud-chip-renderer:contains(Shorts)
+youtube.com##[page-subtype="history"] ytd-video-renderer:has([overlay-style="SHORTS"])
+youtube.com#?#[page-subtype="history"] chip-view-model:contains(Shorts)
+[$path=/]m.youtube.com#?#grid-shelf-view-model:contains(Shorts)
+[$path=/@]m.youtube.com#?#ytm-item-section-renderer:contains(Shorts)
+[$path=/feed/subscriptions]m.youtube.com#?#ytm-rich-section-renderer:contains(Shorts)
+[$path=/results]m.youtube.com#?#grid-shelf-view-model:contains(Nouveautés)
+[$path=/results]m.youtube.com##grid-shelf-view-model:has(ytm-shorts-lockup-view-model)
+[$path=/results]m.youtube.com#?#ytm-video-with-context-renderer:has(ytm-thumbnail-overlay-time-status-renderer:contains(SHORTS))
+m.youtube.com#?#ytm-pivot-bar-item-renderer:has(.yt-core-attributed-string:contains(Shorts))
+[$path=/@]m.youtube.com#?#yt-tab-shape:contains(/^Shorts$/)
+[$path=/history]m.youtube.com#?#ytm-compact-video-renderer:has(ytm-thumbnail-overlay-time-status-renderer:contains(SHORTS))
+[$path=/library]m.youtube.com#?#ytm-compact-video-renderer:has(ytm-thumbnail-overlay-time-status-renderer:contains(SHORTS))

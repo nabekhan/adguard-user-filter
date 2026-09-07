@@ -111,6 +111,24 @@ const normalizePlatforms = (value, allowedPlatforms, path) => {
     return platforms.sort(collator.compare);
 };
 
+const createLocalStub = (suffix, key, target) => {
+    if (suffix !== '.user.js') {
+        return `! ${key}\n`;
+    }
+
+    return [
+        '// ==UserScript==',
+        `// @name         ${key}`,
+        '// @namespace    https://nabekhan.github.io/filters-userscripts/',
+        '// @version      0.0.0',
+        `// @description  Stub userscript for ${target}.`,
+        '// @match        *://*/*',
+        '// @grant        none',
+        '// ==/UserScript==',
+        '',
+    ].join('\n');
+};
+
 const resolveWithin = (directory, path, label) => {
     const directoryPath = resolve(root, directory);
     const absolutePath = resolve(directoryPath, path);
@@ -135,6 +153,7 @@ const normalizeCollection = (
     const normalized = [];
     const originalsBySlug = new Map();
     const localFiles = [];
+    const localStubs = new Map();
     const moves = [];
     const remotePatches = [];
 
@@ -164,11 +183,20 @@ const normalizeCollection = (
         const {
             category: ignoredCategory,
             enabled,
+            excludePlatforms: ignoredExcludePlatforms,
             platforms: ignoredPlatforms,
             source: ignoredSource,
             target: ignoredTarget,
             ...settings
         } = value;
+        if (
+            value.platforms !== undefined &&
+            value.excludePlatforms !== undefined
+        ) {
+            throw new Error(
+                `${entryPath} cannot define both platforms and excludePlatforms`,
+            );
+        }
         const platforms =
             value.platforms === undefined
                 ? undefined
@@ -176,6 +204,14 @@ const normalizeCollection = (
                       value.platforms,
                       allowedPlatforms,
                       `${entryPath}.platforms`,
+                  );
+        const excludePlatforms =
+            value.excludePlatforms === undefined
+                ? undefined
+                : normalizePlatforms(
+                      value.excludePlatforms,
+                      allowedPlatforms,
+                      `${entryPath}.excludePlatforms`,
                   );
         let normalizedSource = source.value;
         if (source.local) {
@@ -186,6 +222,14 @@ const normalizeCollection = (
                     normalizedSource,
                     `${entryPath}.source`,
                 ),
+            );
+            localStubs.set(
+                resolveWithin(
+                    localDirectory,
+                    normalizedSource,
+                    `${entryPath}.source`,
+                ),
+                createLocalStub(localFileSuffix, key, target),
             );
 
             if (normalizedSource !== source.value) {
@@ -217,6 +261,7 @@ const normalizeCollection = (
         const normalizedValue = {
             category,
             enabled,
+            ...(excludePlatforms === undefined ? {} : { excludePlatforms }),
             ...(platforms === undefined ? {} : { platforms }),
             ...settings,
             target,
@@ -241,6 +286,7 @@ const normalizeCollection = (
     return {
         collection: Object.fromEntries(normalized),
         localFiles,
+        localStubs,
         moves,
         remotePatches,
     };
@@ -281,7 +327,10 @@ const applyMoves = async (moves) => {
             if (destinationStatus !== undefined && destinationStatus.isFile()) {
                 continue;
             }
-            throw new Error(`${move.label} does not exist`);
+            if (destinationStatus === undefined) {
+                continue;
+            }
+            throw new Error(`${move.destination} must be a file`);
         }
         if (!sourceStatus.isFile()) {
             throw new Error(`${move.label} must point to a file`);
@@ -300,7 +349,15 @@ const applyMoves = async (moves) => {
 };
 
 const pruneEmptyDirectories = async (directory, keep = directory) => {
-    const entries = await readdir(directory, { withFileTypes: true });
+    let entries;
+    try {
+        entries = await readdir(directory, { withFileTypes: true });
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            return;
+        }
+        throw error;
+    }
     for (const entry of entries) {
         if (entry.isDirectory()) {
             await pruneEmptyDirectories(resolve(directory, entry.name), keep);
@@ -314,7 +371,16 @@ const pruneEmptyDirectories = async (directory, keep = directory) => {
 
 const findFiles = async (directory, matches) => {
     const files = [];
-    for (const entry of await readdir(directory, { withFileTypes: true })) {
+    let entries;
+    try {
+        entries = await readdir(directory, { withFileTypes: true });
+    } catch (error) {
+        if (error.code === 'ENOENT') {
+            return files;
+        }
+        throw error;
+    }
+    for (const entry of entries) {
         const path = resolve(directory, entry.name);
         if (entry.isDirectory()) {
             files.push(...(await findFiles(path, matches)));
@@ -363,7 +429,7 @@ for (const definition of configDefinitions) {
     const configPath = resolve(root, sourcePath);
     const source = await readFile(configPath, 'utf8');
     const config = JSON.parse(source);
-    const { collection, localFiles, moves, remotePatches } =
+    const { collection, localFiles, localStubs, moves, remotePatches } =
         normalizeCollection(
             config[collectionName] ?? {},
             `${sourcePath}.${collectionName}`,
@@ -409,7 +475,14 @@ for (const definition of configDefinitions) {
             remotePatchFormats.push({ path: remotePatch.path, formatted });
         }
     }
-    plans.push({ configPath, formatted, localFiles, moves, remotePatches });
+    plans.push({
+        configPath,
+        formatted,
+        localFiles,
+        localStubs,
+        moves,
+        remotePatches,
+    });
 }
 
 const expectedRemotePatches = new Set(
@@ -431,6 +504,9 @@ const obsoleteRemotePatches = existingRemotePatches.filter(
 );
 const expectedLocalFiles = new Set(
     plans.flatMap(({ localFiles }) => localFiles),
+);
+const localStubs = new Map(
+    plans.flatMap(({ localStubs }) => [...localStubs.entries()]),
 );
 const movingLocalFiles = new Set(
     plans.flatMap(({ moves }) => moves.map(({ source }) => source)),
@@ -476,9 +552,11 @@ if (formattingIssues.length > 0) {
     );
 }
 if (missingLocalFiles.length > 0) {
-    throw new Error(
-        `${missingLocalFiles.map((path) => relative(root, path)).join(', ')} listed in config but missing`,
-    );
+    if (checking) {
+        throw new Error(
+            `${missingLocalFiles.map((path) => relative(root, path)).join(', ')} listed in config but missing; run npm run format`,
+        );
+    }
 }
 if (checking && missingRemotePatches.length > 0) {
     throw new Error(
@@ -501,6 +579,10 @@ if (!checking) {
         await confirmLocalRemoval(obsoleteLocalFiles);
     }
     await applyMoves(plans.flatMap(({ moves }) => moves));
+    for (const path of missingLocalFiles) {
+        await mkdir(dirname(path), { recursive: true });
+        await writeFile(path, localStubs.get(path) ?? '');
+    }
     for (const { path, source } of missingRemotePatches) {
         await mkdir(dirname(path), { recursive: true });
         await writeFile(path, serializeRemotePatch(createRemotePatch(source)));

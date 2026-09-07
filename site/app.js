@@ -10,6 +10,7 @@ const platformLabels = {
   chromium: 'Chromium',
   firefox: 'Firefox',
 };
+const dnsPlatformNames = ['ios', 'android', 'mac', 'windows', 'linux'];
 
 const loadJson = async (path) => {
   const response = await fetch(path);
@@ -48,12 +49,18 @@ const copyText = async (value) => {
   }
 };
 
-const renderFilters = (config) => {
-  const root = document.querySelector('#filters');
+const renderSubscriptions = (config, selector, directory, platforms) => {
+  const root = document.querySelector(selector);
   root.replaceChildren();
 
-  for (const [platform, label] of Object.entries(platformLabels)) {
-    const url = `https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filters/${platform}.txt`;
+  if (platforms.length === 0) {
+    root.textContent = 'None';
+    return;
+  }
+
+  for (const platform of platforms) {
+    const label = platformLabels[platform];
+    const url = `https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/${directory}/${platform}.txt`;
     const button = document.createElement('button');
     button.className = 'button';
     button.type = 'button';
@@ -77,6 +84,30 @@ const renderFilters = (config) => {
 
     root.append(button);
   }
+};
+
+const configuredPlatforms = (config, supportedPlatforms) =>
+  supportedPlatforms.filter((platform) =>
+    Object.values(config.lists).some(
+      (list) =>
+        list.enabled &&
+        (list.platforms?.includes(platform) ??
+          !list.excludePlatforms?.includes(platform)),
+    ),
+  );
+
+const describePlatforms = (entry) => {
+  if (entry.platforms !== undefined) {
+    return entry.platforms
+      .map((platform) => platformLabels[platform])
+      .join(', ');
+  }
+  if (entry.excludePlatforms !== undefined) {
+    return `All except ${entry.excludePlatforms
+      .map((platform) => platformLabels[platform])
+      .join(', ')}`;
+  }
+  return 'All';
 };
 
 const renderUserscripts = (config) => {
@@ -152,13 +183,7 @@ const renderUserscripts = (config) => {
     details.replaceChildren();
     addDetail(details, 'Category', script.category);
     addDetail(details, 'Target', script.target);
-    addDetail(
-      details,
-      'Platforms',
-      script.platforms
-        ?.map((platform) => platformLabels[platform])
-        .join(', ') || 'All',
-    );
+    addDetail(details, 'Platforms', describePlatforms(script));
     addDetail(details, 'Recommend', script.enabled ? 'Install' : 'Skip');
     copyUrl.textContent = 'Copy URL';
     copyUrl.title = `Copy ${script.key} URL`;
@@ -192,16 +217,31 @@ const renderUserscripts = (config) => {
 };
 
 const showError = (error) => {
-  for (const selector of ['#filters', '#userscripts']) {
+  for (const selector of ['#adfilters', '#dnsfilters', '#userscripts']) {
     const root = document.querySelector(selector);
     root.className = 'error';
     root.textContent = error.message;
   }
 };
 
-Promise.all([loadJson('filter.json'), loadJson('userscripts.json')])
-  .then(([filters, userscripts]) => {
-    renderFilters(filters);
+Promise.all([
+  loadJson('adfilters.json'),
+  loadJson('dnsfilters.json'),
+  loadJson('userscripts.json'),
+])
+  .then(([adfilters, dnsfilters, userscripts]) => {
+    renderSubscriptions(
+      adfilters,
+      '#adfilters',
+      'adfilters',
+      Object.keys(platformLabels),
+    );
+    renderSubscriptions(
+      dnsfilters,
+      '#dnsfilters',
+      'dnsfilters',
+      configuredPlatforms(dnsfilters, dnsPlatformNames),
+    );
     renderUserscripts(userscripts);
   })
   .catch(showError);

@@ -142,7 +142,7 @@ for (const path of ['index.html', 'app.js', 'style.css']) {
         resolve(siteOutput, basename(path)),
     );
 }
-for (const path of ['filter.json', 'userscripts.json']) {
+for (const path of ['adfilters.json', 'dnsfilters.json', 'userscripts.json']) {
     await copyFile(resolve(root, 'dist', path), resolve(siteOutput, path));
 }
 await writeFile(resolve(siteOutput, 'userscripts.zip'), createZip(scriptFiles));

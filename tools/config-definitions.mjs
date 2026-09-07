@@ -1,4 +1,4 @@
-export const filterPlatformFlags = {
+export const adfilterPlatformFlags = {
     android: 'adguard_app_android',
     chromium: 'adguard_ext_chromium_mv3',
     firefox: 'adguard_ext_firefox',
@@ -8,17 +8,28 @@ export const filterPlatformFlags = {
     safari: 'adguard_ext_safari',
     windows: 'adguard_app_windows',
 };
-export const platformNames = Object.keys(filterPlatformFlags);
+export const platformNames = Object.keys(adfilterPlatformFlags);
+export const dnsPlatformNames = ['android', 'ios', 'linux', 'mac', 'windows'];
 
 export const configDefinitions = [
     {
-        sourcePath: 'sources/filter.json',
-        outputPath: 'filter.json',
+        sourcePath: 'sources/adfilters.json',
+        outputPath: 'adfilters.json',
         collectionName: 'lists',
-        localDirectory: 'sources/filters',
+        localDirectory: 'sources/adfilters',
         localFileSuffix: '.txt',
         allowedPlatforms: platformNames,
-        platformFlags: filterPlatformFlags,
+        platformFlags: adfilterPlatformFlags,
+        requiredStringFields: ['title', 'description', 'homepage', 'expires'],
+        optionalStringFields: [],
+    },
+    {
+        sourcePath: 'sources/dnsfilters.json',
+        outputPath: 'dnsfilters.json',
+        collectionName: 'lists',
+        localDirectory: 'sources/dnsfilters',
+        localFileSuffix: '.txt',
+        allowedPlatforms: dnsPlatformNames,
         requiredStringFields: ['title', 'description', 'homepage', 'expires'],
         optionalStringFields: [],
     },
