@@ -12,6 +12,7 @@
 - Local files: `sources/adfilters/<target>/<key>.txt`
 - Remote patches: `sources/adfilters/<target>/<key>.patch.mjs`
 - Generated config: `dist/adfilters.json`
+- Compiler: `@adguard/filters-compiler`
 
 | Platform | Subscription path             |
 | -------- | ----------------------------- |
@@ -31,7 +32,6 @@
 - Remote patches: `sources/dnsfilters/<target>/<key>.patch.mjs`
 - Generated config: `dist/dnsfilters.json`
 - Compiler: `@adguard/hostlist-compiler`
-- Validation: `Validate`, AGLint
 
 | Target  | Subscription path             |
 | ------- | ----------------------------- |
