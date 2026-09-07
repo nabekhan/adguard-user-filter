@@ -1,4 +1,5 @@
-import { copyFile, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, isAbsolute, relative, resolve, sep } from 'node:path';
 import { compile } from '@adguard/filters-compiler';
 
@@ -220,20 +221,56 @@ await compile(
 );
 
 const subscriptions = {
-    android: 'android/filters/100001.txt',
-    ios: 'ios/filters/100001.txt',
-    linux: 'cli/filters/100001.txt',
-    mac: 'mac_v3/filters/100001.txt',
-    safari: 'extension/safari/filters/100001.txt',
-    chromium: 'extension/chromium-mv3/filters/100001.txt',
-    firefox: 'extension/firefox/filters/100001.txt',
-    windows: 'windows/filters/100001.txt',
+    android: { label: 'Android', source: 'android/filters/100001.txt' },
+    ios: { label: 'iOS', source: 'ios/filters/100001.txt' },
+    linux: { label: 'Linux', source: 'cli/filters/100001.txt' },
+    mac: { label: 'Mac', source: 'mac_v3/filters/100001.txt' },
+    safari: {
+        label: 'Safari',
+        source: 'extension/safari/filters/100001.txt',
+    },
+    chromium: {
+        label: 'Chromium',
+        source: 'extension/chromium-mv3/filters/100001.txt',
+    },
+    firefox: {
+        label: 'Firefox',
+        source: 'extension/firefox/filters/100001.txt',
+    },
+    windows: { label: 'Windows', source: 'windows/filters/100001.txt' },
+};
+
+const addSubscriptionMetadata = (contents, platform) => {
+    const lineEnding = contents.includes('\r\n') ? '\r\n' : '\n';
+    const checksumPattern = /^! Checksum:[^\r\n]*(?:\r?\n)/;
+    const descriptionPattern = /^! Description:[^\r\n]*$/m;
+    const withoutChecksum = contents.replace(checksumPattern, '');
+    const description = withoutChecksum.match(descriptionPattern)?.[0];
+
+    if (withoutChecksum === contents || description === undefined) {
+        throw new Error(`Missing generated filter metadata for ${platform}`);
+    }
+
+    const metadata = [
+        description,
+        `! Homepage: ${config.homepage}`,
+        `! Platform: ${platform}`,
+    ].join(lineEnding);
+    const withMetadata = withoutChecksum.replace(description, metadata);
+    const normalized = withMetadata.replace(/\r/g, '').replace(/\n+/g, '\n');
+    const checksum = createHash('md5')
+        .update(normalized)
+        .digest('base64')
+        .replace(/=+$/g, '');
+
+    return `! Checksum: ${checksum}${lineEnding}${withMetadata}`;
 };
 
 await mkdir(distFiltersDir, { recursive: true });
-for (const [name, source] of Object.entries(subscriptions)) {
-    await copyFile(
-        resolve(platformsDir, source),
+for (const [name, { label, source }] of Object.entries(subscriptions)) {
+    const contents = await readFile(resolve(platformsDir, source), 'utf8');
+    await writeFile(
         resolve(distFiltersDir, `${name}.txt`),
+        addSubscriptionMetadata(contents, label),
     );
 }

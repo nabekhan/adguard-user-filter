@@ -1,7 +1,7 @@
 {
   "title": "Personal Filters",
   "description": "Lists of filters for various websites.",
-  "homepage": "https://github.com/nabekhan/filters-userscripts",
+  "homepage": "https://nabekhan.github.io/filters-userscripts/",
   "expires": "1 week",
   "lists": {
     "siri-ai-enable": {
