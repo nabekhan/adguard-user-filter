@@ -1,11 +1,11 @@
-! Checksum: XLISsFHE/hEqn/7+cLanAg
+! Checksum: Vr+xz07B+KYsPe9Ce56DJg
 ! Title: Personal Ad Filters
 ! Description: Lists of ad filters for various websites.
 ! Homepage: https://nabekhan.github.io/filters-userscripts/
 ! Platform: Safari
 ! Rules: 316627
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-07T01:59:45+00:00
+! TimeUpdated: 2026-09-07T02:02:26+00:00
 ! Expires: 1 week (update frequency)
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
 youtube.com#?#[page-subtype="channels"] ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:contains(/(^| )Shorts( |$)/i))
