@@ -7,14 +7,14 @@
     "hagezi-pro": {
       "category": "privacy",
       "enabled": true,
-      "excludePlatforms": ["android", "ios"],
+      "platforms": ["desktop-server"],
       "target": "hagezi",
       "source": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.txt"
     },
     "hagezi-tif-medium": {
       "category": "security",
       "enabled": true,
-      "platforms": ["android", "ios"],
+      "platforms": ["mobile"],
       "target": "hagezi",
       "source": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.medium.txt"
     }

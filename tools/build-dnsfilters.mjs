@@ -25,11 +25,8 @@ const rawFiltersUrl = new URL(
 const localFiltersDir = resolve(root, 'sources', 'dnsfilters');
 const allowedPlatforms = new Set(dnsPlatformNames);
 const platformLabels = {
-    android: 'Android',
-    ios: 'iOS',
-    linux: 'Linux',
-    mac: 'Mac',
-    windows: 'Windows',
+    mobile: 'Mobile',
+    'desktop-server': 'Desktop/server',
 };
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)

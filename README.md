@@ -33,13 +33,10 @@
 - Compiler: `@adguard/hostlist-compiler`, including its DNS `Validate`
   transformation
 
-| Platform | Subscription path             |
-| -------- | ----------------------------- |
-| iOS      | `dist/dnsfilters/ios.txt`     |
-| Android  | `dist/dnsfilters/android.txt` |
-| Mac      | `dist/dnsfilters/mac.txt`     |
-| Windows  | `dist/dnsfilters/windows.txt` |
-| Linux    | `dist/dnsfilters/linux.txt`   |
+| Target         | Subscription path                    |
+| -------------- | ------------------------------------ |
+| Mobile         | `dist/dnsfilters/mobile.txt`         |
+| Desktop/server | `dist/dnsfilters/desktop-server.txt` |
 
 For ad filters, DNS filters, and userscripts, use `platforms` to include only
 specific platforms or `excludePlatforms` to include every supported platform

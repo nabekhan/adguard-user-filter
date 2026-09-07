@@ -8,9 +8,8 @@
       "category": "privacy",
       "enabled": true,
       "target": "hagezi",
-      "excludePlatforms": [
-        "android",
-        "ios"
+      "platforms": [
+        "desktop-server"
       ],
       "url": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.txt"
     },
@@ -19,8 +18,7 @@
       "enabled": true,
       "target": "hagezi",
       "platforms": [
-        "android",
-        "ios"
+        "mobile"
       ],
       "url": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/tif.medium.txt"
     }

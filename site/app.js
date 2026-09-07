@@ -9,8 +9,20 @@ const platformLabels = {
   safari: 'Safari',
   chromium: 'Chromium',
   firefox: 'Firefox',
+  mobile: 'Mobile',
+  'desktop-server': 'Desktop/server',
 };
-const dnsPlatformNames = ['ios', 'android', 'mac', 'windows', 'linux'];
+const adfilterPlatformNames = [
+  'ios',
+  'android',
+  'mac',
+  'windows',
+  'linux',
+  'safari',
+  'chromium',
+  'firefox',
+];
+const dnsPlatformNames = ['mobile', 'desktop-server'];
 
 const loadJson = async (path) => {
   const response = await fetch(path);
@@ -234,7 +246,7 @@ Promise.all([
       adfilters,
       '#adfilters',
       'adfilters',
-      Object.keys(platformLabels),
+      adfilterPlatformNames,
     );
     renderSubscriptions(
       dnsfilters,
