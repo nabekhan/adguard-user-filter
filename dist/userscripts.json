@@ -1,6 +1,6 @@
 {
-  "title": "Userscripts",
-  "description": "Commonly used userscripts for various websites.",
+  "title": "Personal Userscripts",
+  "description": "Userscripts for various websites.",
   "homepage": "https://github.com/nabekhan/filters-userscripts",
   "requires": "userscript-installer",
   "scripts": {
