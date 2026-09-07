@@ -16,6 +16,55 @@
       "enabled": true,
       "target": "youtube",
       "source": "https://raw.githubusercontent.com/Norsagir/adguard-custom-filters/main/youtube-hide-shorts.txt"
+    },
+    "adguard-base-filter": {
+      "category": "ads",
+      "enabled": true,
+      "target": "global",
+      "source": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_2_Base/filter.txt"
+    },
+    "adguard-mobile-filter": {
+      "category": "ads",
+      "enabled": true,
+      "platforms": ["android", "ios"],
+      "target": "global",
+      "source": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_11_Mobile/filter.txt"
+    },
+    "adguard-annoyances-filter": {
+      "category": "annoyances",
+      "enabled": true,
+      "target": "global",
+      "source": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_14_Annoyances/filter.txt"
+    },
+    "adguard-experimental-filter": {
+      "category": "experimental",
+      "enabled": true,
+      "target": "global",
+      "source": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_5_Experimental/filter.txt"
+    },
+    "adguard-mail-tracking-protection-filter": {
+      "category": "privacy",
+      "enabled": true,
+      "target": "global",
+      "source": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_25_Mail_Tracking_Protection/filter.txt"
+    },
+    "adguard-tracking-protection-filter": {
+      "category": "privacy",
+      "enabled": true,
+      "target": "global",
+      "source": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_3_Spyware/filter.txt"
+    },
+    "adguard-url-tracking-filter": {
+      "category": "privacy",
+      "enabled": true,
+      "target": "global",
+      "source": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_17_TrackParam/filter.txt"
+    },
+    "adguard-social-media-filter": {
+      "category": "social",
+      "enabled": true,
+      "target": "global",
+      "source": "https://raw.githubusercontent.com/AdguardTeam/FiltersRegistry/master/filters/filter_4_Social/filter.txt"
     }
   }
 }

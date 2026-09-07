@@ -7,13 +7,13 @@
     "adguard-sdns-filter": {
       "category": "privacy",
       "enabled": true,
-      "target": "adguard",
+      "target": "global",
       "url": "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
     },
     "hagezi-pro": {
       "category": "privacy",
       "enabled": true,
-      "target": "hagezi",
+      "target": "global",
       "excludePlatforms": [
         "mobile"
       ],
@@ -22,7 +22,7 @@
     "hagezi-pro-mini": {
       "category": "privacy",
       "enabled": true,
-      "target": "hagezi",
+      "target": "global",
       "platforms": [
         "mobile"
       ],
@@ -31,7 +31,7 @@
     "hagezi-tif-medium": {
       "category": "security",
       "enabled": true,
-      "target": "hagezi",
+      "target": "global",
       "platforms": [
         "desktop"
       ],
@@ -40,7 +40,7 @@
     "hagezi-tif-mini": {
       "category": "security",
       "enabled": true,
-      "target": "hagezi",
+      "target": "global",
       "platforms": [
         "mobile",
         "server"

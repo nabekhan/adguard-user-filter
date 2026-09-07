@@ -7,35 +7,35 @@
     "adguard-sdns-filter": {
       "category": "privacy",
       "enabled": true,
-      "target": "adguard",
+      "target": "global",
       "source": "https://adguardteam.github.io/AdGuardSDNSFilter/Filters/filter.txt"
     },
     "hagezi-pro": {
       "category": "privacy",
       "enabled": true,
       "excludePlatforms": ["mobile"],
-      "target": "hagezi",
+      "target": "global",
       "source": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/pro.txt"
     },
     "hagezi-pro-mini": {
       "category": "privacy",
       "enabled": true,
       "platforms": ["mobile"],
-      "target": "hagezi",
+      "target": "global",
       "source": "https://raw.githubusercontent.com/hagezi/dns-blocklists/main/adblock/pro.mini.txt"
     },
     "hagezi-tif-medium": {
       "category": "security",
       "enabled": true,
       "platforms": ["desktop"],
-      "target": "hagezi",
+      "target": "global",
       "source": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/tif.medium.txt"
     },
     "hagezi-tif-mini": {
       "category": "security",
       "enabled": true,
       "platforms": ["mobile", "server"],
-      "target": "hagezi",
+      "target": "global",
       "source": "https://cdn.jsdelivr.net/gh/hagezi/dns-blocklists@latest/adblock/tif.mini.txt"
     }
   }
