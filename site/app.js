@@ -27,21 +27,55 @@ const addDetail = (list, label, value) => {
   list.append(term, description);
 };
 
+const copyText = async (value) => {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(value);
+    return;
+  }
+
+  const input = document.createElement('textarea');
+  input.value = value;
+  input.readOnly = true;
+  input.style.position = 'fixed';
+  input.style.opacity = '0';
+  document.body.append(input);
+  input.select();
+  const copied = document.execCommand('copy');
+  input.remove();
+
+  if (!copied) {
+    throw new Error('Unable to copy the filter URL');
+  }
+};
+
 const renderFilters = (config) => {
   const root = document.querySelector('#filters');
   root.replaceChildren();
 
   for (const [platform, label] of Object.entries(platformLabels)) {
     const url = `https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filters/${platform}.txt`;
-    const subscription = new URL('abp:subscribe');
-    subscription.searchParams.set('location', url);
-    subscription.searchParams.set('title', `${config.title} (${label})`);
+    const button = document.createElement('button');
+    button.className = 'button';
+    button.type = 'button';
+    button.textContent = label;
+    button.title = `Copy ${config.title} URL for ${label}`;
+    button.setAttribute('aria-label', `Copy ${config.title} URL for ${label}`);
 
-    const link = document.createElement('a');
-    link.className = 'button';
-    link.href = subscription.href;
-    link.textContent = label;
-    root.append(link);
+    let resetLabel;
+    button.addEventListener('click', async () => {
+      clearTimeout(resetLabel);
+      try {
+        await copyText(url);
+        button.textContent = 'Copied!';
+      } catch {
+        button.textContent = 'Copy failed';
+      }
+      resetLabel = setTimeout(() => {
+        button.textContent = label;
+      }, 1500);
+    });
+
+    root.append(button);
   }
 };
 
@@ -124,7 +158,7 @@ const renderUserscripts = (config) => {
         ?.map((platform) => platformLabels[platform])
         .join(', ') || 'All',
     );
-    addDetail(details, 'Recommendation', script.enabled ? 'Install' : 'Skip');
+    addDetail(details, 'Recommend', script.enabled ? 'Install' : 'Skip');
     install.href = script.url;
     previous.disabled = index === 0;
     next.disabled = index === scripts.length - 1;
