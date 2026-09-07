@@ -1,3 +1,4 @@
 ! Fix New Apple AI
 
 @@||metrics.icloud.com^$important
+@@||mask-api.icloud.com^$important
