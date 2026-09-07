@@ -1,8 +1,8 @@
-! Checksum: mCBYs8Ahx61Bzu+v3CQPuA
+! Checksum: ytGLeoZYffn9i0IGpTBElQ
 ! Title: Personal Filters
 ! Description: Lists of filters for various websites.
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-07T00:21:02+00:00
+! TimeUpdated: 2026-09-07T00:22:28+00:00
 ! Expires: 12 hours (update frequency)
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
 youtube.com#?#[page-subtype="channels"] ytd-reel-shelf-renderer:has(.ytd-reel-shelf-renderer:contains(/(^| )Shorts( |$)/i))
