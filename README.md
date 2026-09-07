@@ -37,6 +37,7 @@
 | ------- | ----------------------------- |
 | Mobile  | `dist/dnsfilters/mobile.txt`  |
 | Desktop | `dist/dnsfilters/desktop.txt` |
+| Server  | `dist/dnsfilters/server.txt`  |
 
 ## Config
 

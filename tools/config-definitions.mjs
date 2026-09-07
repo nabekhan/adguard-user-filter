@@ -9,7 +9,7 @@ export const adfilterPlatformFlags = {
     windows: 'adguard_app_windows',
 };
 export const platformNames = Object.keys(adfilterPlatformFlags);
-export const dnsPlatformNames = ['mobile', 'desktop'];
+export const dnsPlatformNames = ['mobile', 'desktop', 'server'];
 
 export const configDefinitions = [
     {

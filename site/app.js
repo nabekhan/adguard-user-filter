@@ -11,6 +11,7 @@ const platformLabels = {
   firefox: 'Firefox',
   mobile: 'Mobile',
   desktop: 'Desktop',
+  server: 'Server',
 };
 const adfilterPlatformNames = [
   'ios',
@@ -22,7 +23,7 @@ const adfilterPlatformNames = [
   'chromium',
   'firefox',
 ];
-const dnsPlatformNames = ['mobile', 'desktop'];
+const dnsPlatformNames = ['mobile', 'desktop', 'server'];
 
 const loadJson = async (path) => {
   const response = await fetch(path);

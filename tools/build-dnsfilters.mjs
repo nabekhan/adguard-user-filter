@@ -27,6 +27,7 @@ const allowedPlatforms = new Set(dnsPlatformNames);
 const platformLabels = {
     mobile: 'Mobile',
     desktop: 'Desktop',
+    server: 'Server',
 };
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)
