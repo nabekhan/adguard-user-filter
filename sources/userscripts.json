@@ -25,7 +25,7 @@
       "category": "nuisances",
       "enabled": true,
       "target": "youtube",
-      "source": "https://raw.githubusercontent.com/mchangrh/sb.js/main/docs/sb.user.js"
+      "source": "https://update.greasyfork.org/scripts/560869/SponsorBlock%20Lite.user.js"
     },
     "youtube-safari-pip": {
       "category": "tools",
