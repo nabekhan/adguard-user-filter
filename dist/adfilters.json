@@ -2,7 +2,7 @@
   "title": "Personal Ad Filters",
   "description": "Lists of ad filters for various websites.",
   "homepage": "https://nabekhan.github.io/filters-userscripts/",
-  "expires": "1 week",
+  "expires": "1 day",
   "lists": {
     "siri-ai-enable": {
       "category": "other",
