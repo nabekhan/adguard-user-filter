@@ -43,7 +43,6 @@
 
 - `platforms`: included platforms
 - `excludePlatforms`: excluded platforms
-- `platforms` and `excludePlatforms` are mutually exclusive
 - Missing local sources: stubbed by `npm run format`
 - Missing remote patches: stubbed by `npm run format`
 - Unlisted local files: removed by `npm run format:prune`
