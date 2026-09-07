@@ -6,6 +6,12 @@ const checksum = (contents) =>
         .digest('base64')
         .replace(/=+$/g, '');
 
+const countRules = (contents) =>
+    contents.split(/\r?\n/).filter((line) => {
+        const trimmed = line.trim();
+        return trimmed !== '' && !trimmed.startsWith('!');
+    }).length;
+
 export const addSubscriptionMetadata = (contents, { homepage, platform }) => {
     const lineEnding = contents.includes('\r\n') ? '\r\n' : '\n';
     const checksumPattern = /^! Checksum:[^\r\n]*(?:\r?\n)/;
@@ -21,6 +27,7 @@ export const addSubscriptionMetadata = (contents, { homepage, platform }) => {
         description,
         `! Homepage: ${homepage}`,
         `! Platform: ${platform}`,
+        `! Rules: ${countRules(withoutChecksum)}`,
     ].join(lineEnding);
     const withMetadata = withoutChecksum.replace(description, metadata);
 
@@ -43,6 +50,7 @@ export const createSubscription = ({
         `! Description: ${description}`,
         `! Homepage: ${homepage}`,
         `! Platform: ${platform}`,
+        `! Rules: ${rules.length}`,
         `! Version: ${version}`,
         `! TimeUpdated: ${timeUpdated}`,
         `! Expires: ${expires} (update frequency)`,
