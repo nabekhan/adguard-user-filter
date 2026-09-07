@@ -1,10 +1,10 @@
-! Checksum: 7R5vfY1uDZgCjtYTRaxx5g
+! Checksum: O2XsZ4YHsEFZq6BbUrmVlw
 ! Title: Personal DNS Filters
 ! Description: Lists of DNS filters for various websites and services.
 ! Homepage: https://nabekhan.github.io/filters-userscripts/
 ! Platform: Mobile
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-07T01:33:11+00:00
+! TimeUpdated: 2026-09-07T01:35:14+00:00
 ! Expires: 1 week (update frequency)
 ||dtipvw.com^
 ||campingfinishvow.com^
