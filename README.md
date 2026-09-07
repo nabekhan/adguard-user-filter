@@ -1,7 +1,5 @@
 # Filters and userscripts
 
-[Installer](https://nabekhan.github.io/filters-userscripts/)
-
 [Filter config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/filter.json)
 
 [Userscripts config](https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/dist/userscripts.json)
