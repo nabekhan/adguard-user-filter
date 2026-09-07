@@ -1,10 +1,10 @@
-! Checksum: aHLR7MfWCJuDf3cQf2bWHw
+! Checksum: G7s6U6249B4CKM/F9/CbFg
 ! Title: Personal Ad Filters
 ! Description: Lists of ad filters for various websites.
 ! Homepage: https://nabekhan.github.io/filters-userscripts/
 ! Platform: Mac
 ! Version: 1.0.0.0
-! TimeUpdated: 2026-09-07T01:10:36+00:00
+! TimeUpdated: 2026-09-07T01:11:12+00:00
 ! Expires: 12 hours (update frequency)
 @@||metrics.icloud.com^
 youtube.com##[page-subtype="home"] ytd-rich-section-renderer:has([is-shorts])
