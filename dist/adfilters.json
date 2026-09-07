@@ -9,8 +9,8 @@
       "enabled": true,
       "target": "icloud",
       "platforms": [
-        "adguard_app_ios",
-        "adguard_app_mac"
+        "ios",
+        "mac"
       ],
       "url": "https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/adfilters/icloud/siri-ai-enable.txt"
     },

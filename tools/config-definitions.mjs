@@ -19,7 +19,6 @@ export const configDefinitions = [
         localDirectory: 'sources/adfilters',
         localFileSuffix: '.txt',
         allowedPlatforms: platformNames,
-        platformFlags: adfilterPlatformFlags,
         requiredStringFields: ['title', 'description', 'homepage', 'expires'],
         optionalStringFields: [],
     },

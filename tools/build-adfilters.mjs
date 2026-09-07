@@ -23,7 +23,7 @@ const rawFiltersUrl = new URL(
     'https://raw.githubusercontent.com/nabekhan/filters-userscripts/main/sources/adfilters/',
 );
 const localFiltersDir = resolve(root, 'sources', 'adfilters');
-const allowedPlatformFlags = new Set(Object.values(adfilterPlatformFlags));
+const allowedPlatforms = new Set(Object.keys(adfilterPlatformFlags));
 const filterId = 100001;
 const enabled = Object.entries(config.lists ?? {})
     .filter(([, value]) => value?.enabled === true)
@@ -78,7 +78,7 @@ for (const {
         }
         if (
             new Set(platforms).size !== platforms.length ||
-            platforms.some((platform) => !allowedPlatformFlags.has(platform))
+            platforms.some((platform) => !allowedPlatforms.has(platform))
         ) {
             throw new Error(`Invalid platforms for ${name}`);
         }
@@ -91,9 +91,7 @@ for (const {
         }
         if (
             new Set(excludePlatforms).size !== excludePlatforms.length ||
-            excludePlatforms.some(
-                (platform) => !allowedPlatformFlags.has(platform),
-            )
+            excludePlatforms.some((platform) => !allowedPlatforms.has(platform))
         ) {
             throw new Error(`Invalid excluded platforms for ${name}`);
         }
@@ -199,8 +197,12 @@ for (const {
         platforms === undefined
             ? excludePlatforms === undefined
                 ? undefined
-                : `!(${excludePlatforms.join(' || ')})`
-            : platforms.join(' || ');
+                : `!(${excludePlatforms
+                      .map((platform) => adfilterPlatformFlags[platform])
+                      .join(' || ')})`
+            : platforms
+                  .map((platform) => adfilterPlatformFlags[platform])
+                  .join(' || ');
     includes.push(
         platformCondition === undefined
             ? include

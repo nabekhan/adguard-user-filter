@@ -120,7 +120,6 @@ const resolveConfig = async ({
     allowedPlatforms,
     localDirectory,
     localFileSuffix,
-    platformFlags,
     requiredStringFields,
     optionalStringFields,
 }) => {
@@ -301,24 +300,8 @@ const resolveConfig = async ({
 
         collection[name] = {
             ...settings,
-            ...(excludePlatforms === undefined
-                ? {}
-                : {
-                      excludePlatforms: excludePlatforms.map((platform) =>
-                          platformFlags === undefined
-                              ? platform
-                              : platformFlags[platform],
-                      ),
-                  }),
-            ...(platforms === undefined
-                ? {}
-                : {
-                      platforms: platforms.map((platform) =>
-                          platformFlags === undefined
-                              ? platform
-                              : platformFlags[platform],
-                      ),
-                  }),
+            ...(excludePlatforms === undefined ? {} : { excludePlatforms }),
+            ...(platforms === undefined ? {} : { platforms }),
             url: resolvedUrl.href,
         };
     }
