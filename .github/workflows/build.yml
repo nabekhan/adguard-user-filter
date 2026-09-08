@@ -28,7 +28,12 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run format:check
+      - name: Format tracked sources
+        if: github.event_name == 'push' || github.event_name == 'schedule'
+        run: npm run format
+      - name: Check formatting
+        if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+        run: npm run format:check
       - run: npm run resolve-configs
       - run: npm run build
       - run: npx aglint

@@ -15,6 +15,13 @@
       "target": "reddit",
       "source": "https://update.greasyfork.org/scripts/423965/Good%20o%27l%20Reddit.user.js"
     },
+    "oldlander": {
+      "category": "tools",
+      "enabled": true,
+      "platforms": ["ios"],
+      "target": "reddit",
+      "source": "https://raw.githubusercontent.com/OctoNezd/oldlander/ada860d1a3caba19241615e7a9611b4d4cba0397/oldlander.remote.user.js"
+    },
     "autocomplete-deck": {
       "category": "tools",
       "enabled": true,
@@ -45,13 +52,6 @@
       "enabled": true,
       "target": "global",
       "source": "https://update.greasyfork.org/scripts/485772/FMHY%20Base64%20Auto%20Decoder.user.js"
-    },
-    "oldlander": {
-      "category": "tools",
-      "enabled": true,
-      "platforms": ["ios"],
-      "target": "reddit",
-      "source": "https://raw.githubusercontent.com/OctoNezd/oldlander/ada860d1a3caba19241615e7a9611b4d4cba0397/oldlander.remote.user.js"
     }
   }
 }
